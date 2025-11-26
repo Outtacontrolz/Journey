@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Das Journey – Flug Hamburg → Ho-Chi-Minh (3D-Pfeil)</title>
+  <title>Das Journey – Flug Hamburg → Ho-Chi-Minh</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
     body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
@@ -28,30 +28,33 @@
     }
     #startButton:hover { background: #45a049; }
     #startButton:disabled { background: #cccccc; }
+    .plane-icon {
+      font-size: 24px;
+      display: inline-block;
+      transform-origin: center;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div class="info">
     <h3>Das Journey</h3>
-    <p>3D-Pfeil-Animation bereit!</p>
-    <button id="startButton">Animation starten</button>
+    <p>Flugzeug bereit für den Start!</p>
+    <button id="startButton">Flug starten</button>
   </div>
 
-  <!-- Leaflet-Bibliothek + PolylineDecorator für Pfeil-Animation -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylinedecorator.css" />
+  <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylinedecorator.js"></script>
   <script>
-    // Karte initialisieren
+    // Karte initialisieren (weiter rausgezoomt)
     const map = L.map('map').setView([30, 80], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Variablen für Pfeil und Animation
-    let polyline;
-    let decorator;
+    // Variablen für Flugzeug und Animation
+    let plane;
+    let animationInterval;
     let reiseData;
 
     // Flugdaten laden
@@ -59,7 +62,7 @@
       .then(response => response.json())
       .then(data => {
         reiseData = data.reisen[0];
-        document.querySelector('.info p').textContent = "Bereit für die Animation!";
+        document.querySelector('.info p').textContent = "Bereit für den Start!";
 
         // Start- und Ziel-Marker
         L.marker(reiseData.koordinaten[0]).addTo(map)
@@ -67,12 +70,15 @@
         L.marker(reiseData.koordinaten[1]).addTo(map)
           .bindPopup(`<b>${reiseData.ziel}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
 
-        // Linie für den Pfeil zeichnen
-        polyline = L.polyline(reiseData.koordinaten, {
-          color: 'blue',
-          weight: 2,
-          opacity: 0.7
-        }).addTo(map);
+        // Flugzeug-Icon (als HTML-Element mit CSS-Rotation)
+        const planeIcon = L.divIcon({
+          html: '<div class="plane-icon">✈️</div>',
+          iconSize: [30, 30],
+          className: 'plane-marker'
+        });
+
+        // Flugzeug am Startpunkt platzieren
+        plane = L.marker(reiseData.koordinaten[0], { icon: planeIcon }).addTo(map);
 
         // Button zum Starten der Animation
         document.getElementById('startButton').addEventListener('click', startAnimation);
@@ -82,40 +88,59 @@
         document.querySelector('.info p').textContent = "Fehler beim Laden der Flugdaten!";
       });
 
-    // Funktion zum Starten der Pfeil-Animation
+    // Funktion zur Berechnung des Winkels zwischen zwei Koordinaten (in Grad)
+    function calculateBearing(lat1, lng1, lat2, lng2) {
+      const dLng = lng2 - lng1;
+      const y = Math.sin(dLng) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) -
+                Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+      let bearing = Math.atan2(y, x) * 180 / Math.PI;
+      bearing = (bearing + 360) % 360; // Normalisierung auf 0-360°
+      return bearing;
+    }
+
+    // Funktion zum Starten der Animation
     function startAnimation() {
-      document.querySelector('.info p').textContent = "Animation läuft...";
+      document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
       document.getElementById('startButton').disabled = true;
 
-      // Karte erst rauszoomen
+      // Karte erst rauszoomen (globale Ansicht)
       map.setView([30, 80], 2);
 
-      // Pfeil-Dekorator hinzufügen
-      decorator = L.polylineDecorator(polyline, {
-        patterns: [
-          { offset: 0, repeat: 0, symbol: L.Symbol.arrowHead({ pixelSize: 15, polygon: false, pathOptions: { stroke: true, color: 'red', weight: 2 } }) }
-        ]
-      }).addTo(map);
+      const startLat = reiseData.koordinaten[0][0];
+      const startLng = reiseData.koordinaten[0][1];
+      const endLat = reiseData.koordinaten[1][0];
+      const endLng = reiseData.koordinaten[1][1];
+      const bearing = calculateBearing(startLat, startLng, endLat, endLng);
 
-      // Animation: Pfeil wächst entlang der Linie
+      // Flugzeug drehen
+      const planeElement = plane.getElement().querySelector('.plane-icon');
+      planeElement.style.transform = `rotate(${bearing}deg)`;
+
+      // Animation starten
       let progress = 0;
-      const totalSteps = 100;
-      const animation = setInterval(() => {
+      const totalSteps = 200;
+      const latStep = (endLat - startLat) / totalSteps;
+      const lngStep = (endLng - startLng) / totalSteps;
+
+      clearInterval(animationInterval);
+      animationInterval = setInterval(() => {
         progress++;
         if (progress <= totalSteps) {
-          decorator.setPatterns([
-            { offset: progress + '%', repeat: 0, symbol: L.Symbol.arrowHead({ pixelSize: 15, polygon: false, pathOptions: { stroke: true, color: 'red', weight: 2 } }) }
-          ]);
-          // Zoom auf Vietnam, wenn der Pfeil nah am Ziel ist
+          const newLat = startLat + (latStep * progress);
+          const newLng = startLng + (lngStep * progress);
+          plane.setLatLng([newLat, newLng]);
+
+          // Zoom auf Vietnam, wenn das Flugzeug nah am Ziel ist
           if (progress > totalSteps * 0.8 && progress <= totalSteps * 0.81) {
-            map.setView([12, 108], 5);
+            map.setView([12, 108], 5); // Zeigt mehr von Vietnam
           }
         } else {
-          clearInterval(animation);
-          document.querySelector('.info p').textContent = "Animation abgeschlossen!";
+          clearInterval(animationInterval);
+          document.querySelector('.info p').textContent = "Flug abgeschlossen!";
           document.getElementById('startButton').disabled = false;
         }
-      }, 50);
+      }, 30);
     }
   </script>
 </body>
