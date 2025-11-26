@@ -26,13 +26,8 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    #startButton:hover {
-      background: #45a049;
-    }
-    .plane-icon {
-      font-size: 24px;
-      transform: rotate(0deg); /* Wird dynamisch angepasst */
-    }
+    #startButton:hover { background: #45a049; }
+    #startButton:disabled { background: #cccccc; }
   </style>
 </head>
 <body>
@@ -70,7 +65,7 @@
         L.marker(reiseData.koordinaten[1]).addTo(map)
           .bindPopup(`<b>${reiseData.ziel}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
 
-        // Flugzeug-Icon (gedreht in Flugrichtung)
+        // Flugzeug-Icon (mit CSS-Drehung)
         const planeIcon = L.divIcon({
           html: '✈️',
           iconSize: [30, 30],
@@ -78,7 +73,13 @@
         });
 
         // Flugzeug am Startpunkt platzieren
-        plane = L.marker(reiseData.koordinaten[0], { icon: planeIcon }).addTo(map);
+        plane = L.marker(reiseData.koordinaten[0], {
+          icon: planeIcon,
+          rotationAngle: calculateBearing(
+            reiseData.koordinaten[0][0], reiseData.koordinaten[0][1],
+            reiseData.koordinaten[1][0], reiseData.koordinaten[1][1]
+          )
+        }).addTo(map);
 
         // Button zum Starten der Animation
         document.getElementById('startButton').addEventListener('click', startAnimation);
@@ -88,20 +89,30 @@
         document.querySelector('.info p').textContent = "Fehler beim Laden der Flugdaten!";
       });
 
+    // Funktion zur Berechnung des Winkels zwischen zwei Koordinaten (in Grad)
+    function calculateBearing(lat1, lng1, lat2, lng2) {
+      const dLng = lng2 - lng1;
+      const y = Math.sin(dLng) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) -
+                Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+      let bearing = Math.atan2(y, x) * 180 / Math.PI;
+      bearing = (bearing + 360) % 360; // Normalisierung auf 0-360°
+      return bearing;
+    }
+
     // Funktion zum Starten der Animation
     function startAnimation() {
       document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
       document.getElementById('startButton').disabled = true;
 
-      // Flugzeug-Drehung berechnen (Richtung Ho-Chi-Minh)
       const startLat = reiseData.koordinaten[0][0];
       const startLng = reiseData.koordinaten[0][1];
       const endLat = reiseData.koordinaten[1][0];
       const endLng = reiseData.koordinaten[1][1];
+      const bearing = calculateBearing(startLat, startLng, endLat, endLng);
 
-      // Winkel berechnen (in Grad)
-      const angle = Math.atan2(endLat - startLat, endLng - startLng) * 180 / Math.PI;
-      document.querySelector('.plane-icon').style.transform = `rotate(${angle}deg)`;
+      // Flugzeug drehen
+      plane.setRotationAngle(bearing);
 
       // Animation starten
       let progress = 0;
@@ -109,7 +120,7 @@
       const latStep = (endLat - startLat) / totalSteps;
       const lngStep = (endLng - startLng) / totalSteps;
 
-      clearInterval(animationInterval); // Alte Animation stoppen
+      clearInterval(animationInterval);
       animationInterval = setInterval(() => {
         progress++;
         if (progress <= totalSteps) {
