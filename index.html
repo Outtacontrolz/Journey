@@ -31,7 +31,6 @@
     .plane-icon {
       font-size: 24px;
       display: inline-block;
-      transition: transform 0.1s;
     }
   </style>
 </head>
@@ -128,12 +127,10 @@
           const newLng = startLng + (lngStep * progress);
           plane.setLatLng([newLat, newLng]);
 
-          // Flugzeug während der Bewegung drehen (falls nötig)
-          const currentBearing = calculateBearing(
-            startLat, startLng,
-            newLat, newLng
-          );
-          planeElement.style.transform = `rotate(${currentBearing}deg)`;
+          // Zoom auf Vietnam, wenn das Flugzeug nah am Ziel ist
+          if (progress > totalSteps * 0.8) {
+            map.setView([10.8231, 106.6297], 6); // Zoom auf Ho-Chi-Minh
+          }
         } else {
           clearInterval(animationInterval);
           document.querySelector('.info p').textContent = "Flug abgeschlossen!";
