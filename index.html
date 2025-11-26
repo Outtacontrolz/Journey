@@ -56,6 +56,7 @@
     let plane;
     let animationInterval;
     let reiseData;
+    let startTime;
 
     // Flugdaten laden
     fetch('reisen.json')
@@ -99,7 +100,7 @@
       return bearing;
     }
 
-    // Funktion zum Starten der Animation
+    // Funktion zum Starten der Animation (mit requestAnimationFrame für Flüssigkeit)
     function startAnimation() {
       document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
       document.getElementById('startButton').disabled = true;
@@ -117,31 +118,31 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation starten
-      let progress = 0;
-      const totalSteps = 200;
-      const latStep = (endLat - startLat) / totalSteps;
-      const lngStep = (endLng - startLng) / totalSteps;
+      // Animation mit requestAnimationFrame für maximale Flüssigkeit
+      const duration = 10000; // 10 Sekunden für die Animation
+      startTime = performance.now();
 
-      clearInterval(animationInterval);
-      animationInterval = setInterval(() => {
-        progress++;
-        if (progress <= totalSteps) {
-          const newLat = startLat + (latStep * progress);
-          const newLng = startLng + (lngStep * progress);
-          plane.setLatLng([newLat, newLng]);
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
 
-          // Dynamischer Zoom: Langsam reinzoomen, basierend auf dem Fortschritt
-          if (progress > totalSteps * 0.1) {
-            const zoomLevel = 2 + (progress / totalSteps) * 3; // Von Level 2 auf 5 zoomen
-            map.setView([newLat, newLng], zoomLevel, { animate: true });
-          }
+        const newLat = startLat + (endLat - startLat) * progress;
+        const newLng = startLng + (endLng - startLng) * progress;
+        plane.setLatLng([newLat, newLng]);
+
+        // Dynamischer Zoom: Sanft von Level 2 auf 5 zoomen
+        const zoomLevel = 2 + (progress * 3);
+        map.setView([newLat, newLng], zoomLevel, { animate: false });
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
         } else {
-          clearInterval(animationInterval);
           document.querySelector('.info p').textContent = "Flug abgeschlossen!";
           document.getElementById('startButton').disabled = false;
         }
-      }, 30);
+      }
+
+      requestAnimationFrame(animate);
     }
   </script>
 </body>
