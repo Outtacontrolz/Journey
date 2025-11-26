@@ -17,10 +17,21 @@
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
+    #startButton {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #startButton:hover {
+      background: #45a049;
+    }
     .plane-icon {
       font-size: 24px;
-      color: red;
-      transform: rotate(45deg);
+      transform: rotate(0deg); /* Wird dynamisch angepasst */
     }
   </style>
 </head>
@@ -28,7 +39,8 @@
   <div id="map"></div>
   <div class="info">
     <h3>Das Journey</h3>
-    <p>Flugzeug-Animation wird geladen...</p>
+    <p>Flugzeug bereit für den Start!</p>
+    <button id="startButton">Flug starten</button>
   </div>
 
   <!-- Leaflet-Bibliothek -->
@@ -40,51 +52,77 @@
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
+    // Variablen für Flugzeug und Animation
+    let plane;
+    let animationInterval;
+    let reiseData;
+
     // Flugdaten laden
     fetch('reisen.json')
       .then(response => response.json())
       .then(data => {
-        const reise = data.reisen[0];
+        reiseData = data.reisen[0];
+        document.querySelector('.info p').textContent = "Bereit für den Start!";
 
         // Start- und Ziel-Marker
-        L.marker(reise.koordinaten[0]).addTo(map)
-          .bindPopup(`<b>${reise.start}</b><br>${reise.datum}<br>${reise.beschreibung}`);
-        L.marker(reise.koordinaten[1]).addTo(map)
-          .bindPopup(`<b>${reise.ziel}</b><br>${reise.datum}<br>${reise.beschreibung}`);
+        L.marker(reiseData.koordinaten[0]).addTo(map)
+          .bindPopup(`<b>${reiseData.start}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
+        L.marker(reiseData.koordinaten[1]).addTo(map)
+          .bindPopup(`<b>${reiseData.ziel}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
 
-        // Flugzeug-Icon
+        // Flugzeug-Icon (gedreht in Flugrichtung)
         const planeIcon = L.divIcon({
           html: '✈️',
           iconSize: [30, 30],
           className: 'plane-icon'
         });
 
-        // Flugzeug animieren (manuell mit setInterval)
-        const plane = L.marker(reise.koordinaten[0], { icon: planeIcon }).addTo(map);
-        let progress = 0;
-        const totalSteps = 100;
-        const latStep = (reise.koordinaten[1][0] - reise.koordinaten[0][0]) / totalSteps;
-        const lngStep = (reise.koordinaten[1][1] - reise.koordinaten[0][1]) / totalSteps;
+        // Flugzeug am Startpunkt platzieren
+        plane = L.marker(reiseData.koordinaten[0], { icon: planeIcon }).addTo(map);
 
-        const animation = setInterval(() => {
-          progress++;
-          if (progress <= totalSteps) {
-            const newLat = reise.koordinaten[0][0] + (latStep * progress);
-            const newLng = reise.koordinaten[0][1] + (lngStep * progress);
-            plane.setLatLng([newLat, newLng]);
-          } else {
-            clearInterval(animation);
-            document.querySelector('.info p').textContent = "Flug abgeschlossen!";
-          }
-        }, 50);
-
-        // Info-Text aktualisieren
-        document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ho-Chi-Minh!";
+        // Button zum Starten der Animation
+        document.getElementById('startButton').addEventListener('click', startAnimation);
       })
       .catch(error => {
         console.error("Fehler:", error);
         document.querySelector('.info p').textContent = "Fehler beim Laden der Flugdaten!";
       });
+
+    // Funktion zum Starten der Animation
+    function startAnimation() {
+      document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
+      document.getElementById('startButton').disabled = true;
+
+      // Flugzeug-Drehung berechnen (Richtung Ho-Chi-Minh)
+      const startLat = reiseData.koordinaten[0][0];
+      const startLng = reiseData.koordinaten[0][1];
+      const endLat = reiseData.koordinaten[1][0];
+      const endLng = reiseData.koordinaten[1][1];
+
+      // Winkel berechnen (in Grad)
+      const angle = Math.atan2(endLat - startLat, endLng - startLng) * 180 / Math.PI;
+      document.querySelector('.plane-icon').style.transform = `rotate(${angle}deg)`;
+
+      // Animation starten
+      let progress = 0;
+      const totalSteps = 200;
+      const latStep = (endLat - startLat) / totalSteps;
+      const lngStep = (endLng - startLng) / totalSteps;
+
+      clearInterval(animationInterval); // Alte Animation stoppen
+      animationInterval = setInterval(() => {
+        progress++;
+        if (progress <= totalSteps) {
+          const newLat = startLat + (latStep * progress);
+          const newLng = startLng + (lngStep * progress);
+          plane.setLatLng([newLat, newLng]);
+        } else {
+          clearInterval(animationInterval);
+          document.querySelector('.info p').textContent = "Flug abgeschlossen!";
+          document.getElementById('startButton').disabled = false;
+        }
+      }, 30);
+    }
   </script>
 </body>
 </html>
