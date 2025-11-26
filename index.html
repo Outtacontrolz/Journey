@@ -46,7 +46,7 @@
   <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Karte initialisieren
+    // Karte initialisieren (globale Ansicht)
     const map = L.map('map').setView([30, 80], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
@@ -100,13 +100,10 @@
       return bearing;
     }
 
-    // Funktion zum Starten der Animation (mit Beschleunigung)
+    // Funktion zum Starten der Animation (ohne Blitzen)
     function startAnimation() {
       document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
       document.getElementById('startButton').disabled = true;
-
-      // Karte erst rauszoomen (globale Ansicht)
-      map.setView([30, 80], 2);
 
       const startLat = reiseData.koordinaten[0][0];
       const startLng = reiseData.koordinaten[0][1];
@@ -118,7 +115,7 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit Beschleunigung (Easing-Funktion)
+      // Animation mit Beschleunigung (nur Flugzeug bewegen, Karte nicht neu laden)
       const duration = 8000; // 8 Sekunden Gesamtzeit
       startTime = performance.now();
 
@@ -133,9 +130,10 @@
         const newLng = startLng + (endLng - startLng) * easedProgress;
         plane.setLatLng([newLat, newLng]);
 
-        // Dynamischer Zoom: Sanft von Level 2 auf 5 zoomen
-        const zoomLevel = 2 + (easedProgress * 3);
-        map.setView([newLat, newLng], zoomLevel, { animate: false });
+        // Sanftes Zoomen (nur einmalig, ohne Karte neu zu laden)
+        if (progress > 0.7 && progress <= 0.71) {
+          map.setView([12, 108], 5, { animate: true }); // Einmalig auf Vietnam zoomen
+        }
 
         if (progress < 1) {
           animationId = requestAnimationFrame(animate);
