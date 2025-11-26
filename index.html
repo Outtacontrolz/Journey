@@ -46,8 +46,8 @@
   <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Karte initialisieren
-    const map = L.map('map').setView([30, 80], 2); // Weiter rausgezoomt
+    // Karte initialisieren (weiter rausgezoomt)
+    const map = L.map('map').setView([30, 80], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
@@ -131,14 +131,9 @@
           const newLng = startLng + (lngStep * progress);
           plane.setLatLng([newLat, newLng]);
 
-          // Langsamer zoomen, wenn das Flugzeug nah am Ziel ist
-          if (progress > totalSteps * 0.7) {
-            const zoomLevel = 5 + (1 - (progress / totalSteps)) * 3; // Langsam auf 5 zoomen
-            map.setView([newLat, newLng], zoomLevel);
-          }
-          // Zoom auf Vietnam, wenn das Flugzeug nah am Ziel ist
-          else if (progress > totalSteps * 0.8) {
-            map.setView([12, 108], 5); // Weiter rausgezoomt, um mehr von Vietnam zu zeigen
+          // Zoom auf Vietnam, wenn das Flugzeug nah am Ziel ist (ab 80% der Strecke)
+          if (progress > totalSteps * 0.8 && progress <= totalSteps * 0.81) {
+            map.setView([12, 108], 5); // Zeigt mehr von Vietnam
           }
         } else {
           clearInterval(animationInterval);
