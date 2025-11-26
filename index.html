@@ -2,66 +2,80 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Das Journey – Reisekarte</title>
+  <title>Das Journey – Flug Hamburg → Ho-Chi-Minh</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
     body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
     #map { height: 100vh; width: 100%; }
-    .info { position: absolute; top: 10px; right: 10px; background: white; padding: 10px; z-index: 1000; }
+    .info {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      padding: 10px;
+      z-index: 1000;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div class="info">
     <h3>Das Journey</h3>
-    <p>Reiseziele werden geladen...</p>
+    <p>Flug Hamburg → Ho-Chi-Minh</p>
   </div>
 
-  <!-- Leaflet-Bibliothek -->
+  <!-- Leaflet-Bibliothek + Plugin für animierte Marker -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-animatedmarker@1.0.0/src/AnimatedMarker.js"></script>
   <script>
-    // Karte initialisieren
-    const map = L.map('map').setView([20, 100], 3);
+    // Karte initialisieren (zentriert auf die Flugroute)
+    const map = L.map('map').setView([35, 70], 3);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Reiseziele aus reisen.json laden
+    // Flugroute laden
     fetch('reisen.json')
       .then(response => response.json())
       .then(data => {
-        const infoDiv = document.querySelector('.info p');
-        infoDiv.innerHTML = `${data.reisen.length} Reisen geladen!`;
+        const reise = data.reisen[0]; // Nur der erste Flug
 
-        // Jede Reise auf der Karte anzeigen
-        data.reisen.forEach(reise => {
-          // Linie zwischen Start und Ziel
-          const line = L.polyline(reise.koordinaten, {
-            color: reise.farbe,
-            weight: 2
-          }).addTo(map);
+        // Start- und Ziel-Marker
+        L.marker(reise.koordinaten[0]).addTo(map)
+          .bindPopup(`<b>${reise.start}</b><br>${reise.datum}<br>${reise.beschreibung}`);
+        L.marker(reise.koordinaten[1]).addTo(map)
+          .bindPopup(`<b>${reise.ziel}</b><br>${reise.datum}<br>${reise.beschreibung}`);
 
-          // Marker für Start und Ziel
-          L.marker(reise.koordinaten[0]).addTo(map)
-            .bindPopup(`<b>${reise.start}</b><br>${reise.datum}<br>${reise.beschreibung}`);
-          L.marker(reise.koordinaten[1]).addTo(map)
-            .bindPopup(`<b>${reise.ziel}</b><br>${reise.datum}<br>${reise.beschreibung}`);
+        // Fluglinie (statisch, als Referenz)
+        L.polyline(reise.koordinaten, {
+          color: '#aaa',
+          weight: 1,
+          dashArray: '5, 5'
+        }).addTo(map);
 
-          // Einfache Animation: Linie "wächst" von Start zu Ziel
-          let progress = 0;
-          const animateLine = setInterval(() => {
-            if (progress <= 100) {
-              line.setStyle({ dashArray: `${progress}, 100` });
-              progress += 1;
-            } else {
-              clearInterval(animateLine);
-            }
-          }, 20);
+        // Flugzeug-Icon
+        const planeIcon = L.divIcon({
+          html: '✈️',
+          iconSize: [30, 30],
+          className: 'plane-icon'
         });
+
+        // Animiertes Flugzeug
+        const plane = L.animatedMarker(reise.koordinaten, {
+          icon: planeIcon,
+          interval: 50, // Geschwindigkeit der Animation
+          autoStart: true,
+          loop: false
+        }).addTo(map);
+
+        // Kamera folgt dem Flugzeug
+        plane.on('click', () => map.fitBounds(reise.koordinaten));
       })
       .catch(error => {
-        console.error("Fehler beim Laden der Reisedaten:", error);
-        document.querySelector('.info p').textContent = "Fehler beim Laden der Reisedaten!";
+        console.error("Fehler:", error);
+        document.querySelector('.info p').textContent = "Fehler beim Laden der Flugdaten!";
       });
   </script>
 </body>
