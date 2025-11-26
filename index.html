@@ -54,7 +54,7 @@
 
     // Variablen für Flugzeug und Animation
     let plane;
-    let animationInterval;
+    let animationId;
     let reiseData;
     let startTime;
 
@@ -100,7 +100,7 @@
       return bearing;
     }
 
-    // Funktion zum Starten der Animation (mit requestAnimationFrame für Flüssigkeit)
+    // Funktion zum Starten der Animation (mit Beschleunigung)
     function startAnimation() {
       document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
       document.getElementById('startButton').disabled = true;
@@ -118,25 +118,29 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit requestAnimationFrame für maximale Flüssigkeit
-      const duration = 10000; // 10 Sekunden für die Animation
+      // Animation mit Beschleunigung (Easing-Funktion)
+      const duration = 8000; // 8 Sekunden Gesamtzeit
       startTime = performance.now();
 
       function animate(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        const newLat = startLat + (endLat - startLat) * progress;
-        const newLng = startLng + (endLng - startLng) * progress;
+        // Beschleunigungskurve: Langsam starten, dann schneller werden
+        const easedProgress = progress < 0.5 ? 0.5 * Math.pow(progress * 2, 2) : 1 - 0.5 * Math.pow((1 - progress) * 2, 2);
+
+        const newLat = startLat + (endLat - startLat) * easedProgress;
+        const newLng = startLng + (endLng - startLng) * easedProgress;
         plane.setLatLng([newLat, newLng]);
 
         // Dynamischer Zoom: Sanft von Level 2 auf 5 zoomen
-        const zoomLevel = 2 + (progress * 3);
+        const zoomLevel = 2 + (easedProgress * 3);
         map.setView([newLat, newLng], zoomLevel, { animate: false });
 
         if (progress < 1) {
-          requestAnimationFrame(animate);
+          animationId = requestAnimationFrame(animate);
         } else {
+          cancelAnimationFrame(animationId);
           document.querySelector('.info p').textContent = "Flug abgeschlossen!";
           document.getElementById('startButton').disabled = false;
         }
