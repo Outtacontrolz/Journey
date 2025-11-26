@@ -1,23 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>Das Journey – Reisekarte</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
-    body { margin: 0; padding: 0; }
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
     #map { height: 100vh; width: 100%; }
+    .info { position: absolute; top: 10px; right: 10px; background: white; padding: 10px; z-index: 1000; }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  <div class="info">
+    <h3>Das Journey</h3>
+    <p>Reiseziele werden geladen...</p>
+  </div>
+
+  <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([53.5511, 9.9937], 4);
+    // Karte initialisieren
+    const map = L.map('map').setView([20, 100], 3);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
-    L.marker([53.5511, 9.9937]).addTo(map).bindPopup("Start: Hamburg");
-    L.marker([10.8231, 106.6297]).addTo(map).bindPopup("Ziel: Ho-Chi-Minh");
+
+    // Reiseziele aus reisen.json laden
+    fetch('reisen.json')
+      .then(response => response.json())
+      .then(data => {
+        const infoDiv = document.querySelector('.info p');
+        infoDiv.innerHTML = `${data.reisen.length} Reisen geladen!`;
+
+        // Jede Reise auf der Karte anzeigen
+        data.reisen.forEach(reise => {
+          // Linie zwischen Start und Ziel
+          const line = L.polyline(reise.koordinaten, {
+            color: reise.farbe,
+            weight: 2
+          }).addTo(map);
+
+          // Marker für Start und Ziel
+          L.marker(reise.koordinaten[0]).addTo(map)
+            .bindPopup(`<b>${reise.start}</b><br>${reise.datum}<br>${reise.beschreibung}`);
+          L.marker(reise.koordinaten[1]).addTo(map)
+            .bindPopup(`<b>${reise.ziel}</b><br>${reise.datum}<br>${reise.beschreibung}`);
+
+          // Einfache Animation: Linie "wächst" von Start zu Ziel
+          let progress = 0;
+          const animateLine = setInterval(() => {
+            if (progress <= 100) {
+              line.setStyle({ dashArray: `${progress}, 100` });
+              progress += 1;
+            } else {
+              clearInterval(animateLine);
+            }
+          }, 20);
+        });
+      })
+      .catch(error => {
+        console.error("Fehler beim Laden der Reisedaten:", error);
+        document.querySelector('.info p').textContent = "Fehler beim Laden der Reisedaten!";
+      });
   </script>
 </body>
 </html>
