@@ -31,6 +31,7 @@
     .plane-icon {
       font-size: 24px;
       display: inline-block;
+      transform-origin: center;
     }
   </style>
 </head>
@@ -103,13 +104,16 @@
       document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
       document.getElementById('startButton').disabled = true;
 
+      // Karte erst rauszoomen
+      map.setView([30, 80], 3);
+
       const startLat = reiseData.koordinaten[0][0];
       const startLng = reiseData.koordinaten[0][1];
       const endLat = reiseData.koordinaten[1][0];
       const endLng = reiseData.koordinaten[1][1];
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
 
-      // Flugzeug drehen
+      // Flugzeug drehen (für Hamburg → Ho-Chi-Minh: ca. 90° nach rechts)
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
