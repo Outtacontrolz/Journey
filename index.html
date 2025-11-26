@@ -28,6 +28,11 @@
     }
     #startButton:hover { background: #45a049; }
     #startButton:disabled { background: #cccccc; }
+    .plane-icon {
+      font-size: 24px;
+      display: inline-block;
+      transition: transform 0.1s;
+    }
   </style>
 </head>
 <body>
@@ -65,21 +70,15 @@
         L.marker(reiseData.koordinaten[1]).addTo(map)
           .bindPopup(`<b>${reiseData.ziel}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
 
-        // Flugzeug-Icon (mit CSS-Drehung)
+        // Flugzeug-Icon (als HTML-Element mit CSS-Rotation)
         const planeIcon = L.divIcon({
-          html: '✈️',
+          html: '<div class="plane-icon">✈️</div>',
           iconSize: [30, 30],
-          className: 'plane-icon'
+          className: 'plane-marker'
         });
 
         // Flugzeug am Startpunkt platzieren
-        plane = L.marker(reiseData.koordinaten[0], {
-          icon: planeIcon,
-          rotationAngle: calculateBearing(
-            reiseData.koordinaten[0][0], reiseData.koordinaten[0][1],
-            reiseData.koordinaten[1][0], reiseData.koordinaten[1][1]
-          )
-        }).addTo(map);
+        plane = L.marker(reiseData.koordinaten[0], { icon: planeIcon }).addTo(map);
 
         // Button zum Starten der Animation
         document.getElementById('startButton').addEventListener('click', startAnimation);
@@ -112,7 +111,8 @@
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
 
       // Flugzeug drehen
-      plane.setRotationAngle(bearing);
+      const planeElement = plane.getElement().querySelector('.plane-icon');
+      planeElement.style.transform = `rotate(${bearing}deg)`;
 
       // Animation starten
       let progress = 0;
@@ -127,6 +127,13 @@
           const newLat = startLat + (latStep * progress);
           const newLng = startLng + (lngStep * progress);
           plane.setLatLng([newLat, newLng]);
+
+          // Flugzeug während der Bewegung drehen (falls nötig)
+          const currentBearing = calculateBearing(
+            startLat, startLng,
+            newLat, newLng
+          );
+          planeElement.style.transform = `rotate(${currentBearing}deg)`;
         } else {
           clearInterval(animationInterval);
           document.querySelector('.info p').textContent = "Flug abgeschlossen!";
