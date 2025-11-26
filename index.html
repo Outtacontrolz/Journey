@@ -17,43 +17,40 @@
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
+    .plane-icon {
+      font-size: 24px;
+      color: red;
+      transform: rotate(45deg);
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div class="info">
     <h3>Das Journey</h3>
-    <p>Flug Hamburg → Ho-Chi-Minh</p>
+    <p>Flugzeug-Animation wird geladen...</p>
   </div>
 
-  <!-- Leaflet-Bibliothek + Plugin für animierte Marker -->
+  <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-animatedmarker@1.0.0/src/AnimatedMarker.js"></script>
   <script>
-    // Karte initialisieren (zentriert auf die Flugroute)
-    const map = L.map('map').setView([35, 70], 3);
+    // Karte initialisieren
+    const map = L.map('map').setView([30, 80], 3);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Flugroute laden
+    // Flugdaten laden
     fetch('reisen.json')
       .then(response => response.json())
       .then(data => {
-        const reise = data.reisen[0]; // Nur der erste Flug
+        const reise = data.reisen[0];
 
         // Start- und Ziel-Marker
         L.marker(reise.koordinaten[0]).addTo(map)
           .bindPopup(`<b>${reise.start}</b><br>${reise.datum}<br>${reise.beschreibung}`);
         L.marker(reise.koordinaten[1]).addTo(map)
           .bindPopup(`<b>${reise.ziel}</b><br>${reise.datum}<br>${reise.beschreibung}`);
-
-        // Fluglinie (statisch, als Referenz)
-        L.polyline(reise.koordinaten, {
-          color: '#aaa',
-          weight: 1,
-          dashArray: '5, 5'
-        }).addTo(map);
 
         // Flugzeug-Icon
         const planeIcon = L.divIcon({
@@ -62,16 +59,27 @@
           className: 'plane-icon'
         });
 
-        // Animiertes Flugzeug
-        const plane = L.animatedMarker(reise.koordinaten, {
-          icon: planeIcon,
-          interval: 50, // Geschwindigkeit der Animation
-          autoStart: true,
-          loop: false
-        }).addTo(map);
+        // Flugzeug animieren (manuell mit setInterval)
+        const plane = L.marker(reise.koordinaten[0], { icon: planeIcon }).addTo(map);
+        let progress = 0;
+        const totalSteps = 100;
+        const latStep = (reise.koordinaten[1][0] - reise.koordinaten[0][0]) / totalSteps;
+        const lngStep = (reise.koordinaten[1][1] - reise.koordinaten[0][1]) / totalSteps;
 
-        // Kamera folgt dem Flugzeug
-        plane.on('click', () => map.fitBounds(reise.koordinaten));
+        const animation = setInterval(() => {
+          progress++;
+          if (progress <= totalSteps) {
+            const newLat = reise.koordinaten[0][0] + (latStep * progress);
+            const newLng = reise.koordinaten[0][1] + (lngStep * progress);
+            plane.setLatLng([newLat, newLng]);
+          } else {
+            clearInterval(animation);
+            document.querySelector('.info p').textContent = "Flug abgeschlossen!";
+          }
+        }, 50);
+
+        // Info-Text aktualisieren
+        document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ho-Chi-Minh!";
       })
       .catch(error => {
         console.error("Fehler:", error);
