@@ -46,7 +46,7 @@
   <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Karte initialisieren (weiter rausgezoomt)
+    // Karte initialisieren
     const map = L.map('map').setView([30, 80], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
@@ -131,9 +131,10 @@
           const newLng = startLng + (lngStep * progress);
           plane.setLatLng([newLat, newLng]);
 
-          // Zoom auf Vietnam, wenn das Flugzeug nah am Ziel ist
-          if (progress > totalSteps * 0.8 && progress <= totalSteps * 0.81) {
-            map.setView([12, 108], 5); // Zeigt mehr von Vietnam
+          // Dynamischer Zoom: Langsam reinzoomen, basierend auf dem Fortschritt
+          if (progress > totalSteps * 0.1) {
+            const zoomLevel = 2 + (progress / totalSteps) * 3; // Von Level 2 auf 5 zoomen
+            map.setView([newLat, newLng], zoomLevel, { animate: true });
           }
         } else {
           clearInterval(animationInterval);
