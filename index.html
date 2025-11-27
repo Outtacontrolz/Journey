@@ -134,7 +134,7 @@
       }
       return L.divIcon({
         html: `<div class="vehicle-icon">${icon}</div>`,
-        iconSize: [30, 30],
+        iconSize: [40, 40],
         className: 'vehicle-marker'
       });
     }
@@ -243,7 +243,7 @@
               // 2 Sekunden Pause in Da Nang
               setTimeout(() => {
                 document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ha Noi!";
-                map.setView([18, 106], 5);
+                map.setView([16.5, 107.5], 6);
 
                 // Flug von Da Nang nach Ha Noi
                 animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, 'plane', () => {
@@ -286,7 +286,7 @@
                               // Flug von Manila nach Dumaguete
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
                                 document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
-				map.setView([9, 123], 11);
+				map.setView([9.28, 123.41], 10);
 
                                 // Fahrzeug auf Fähre ändern
                                 vehicle.setIcon(createVehicleIcon('ferry'));
