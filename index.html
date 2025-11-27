@@ -215,19 +215,21 @@
           // 2 Sekunden Pause in Ho-Chi-Minh
           setTimeout(() => {
             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Da Nang!";
+            map.setView([16.5, 107.5], 6);
 
             // Flug von Ho-Chi-Minh nach Da Nang
             animateMovement(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, 'plane', () => {
               document.querySelector('.info p').textContent = "2 Sekunden Stopp in Da Nang!";
-              map.setView([16.5, 107.5], 6); // Neuer Kartenausschnitt für Da Nang
 
               // 2 Sekunden Pause in Da Nang
               setTimeout(() => {
                 document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ha Noi!";
+                map.setView([18, 106], 5);
 
                 // Flug von Da Nang nach Ha Noi
                 animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, 'plane', () => {
                   document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
+                  map.setView([21.5, 104.5], 7); // Weiter reingezoomt vor der Busfahrt nach Sa Pa
 
                   // 2 Sekunden Pause in Ha Noi
                   setTimeout(() => {
@@ -243,6 +245,7 @@
                       // 2 Sekunden Pause in Sa Pa
                       setTimeout(() => {
                         document.querySelector('.info p').textContent = "Busfahrt zurück nach Ha Noi!";
+                        map.setView([21.5, 104.5], 7);
 
                         // Busfahrt von Sa Pa nach Ha Noi
                         animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
