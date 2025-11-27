@@ -254,7 +254,7 @@
                           // 2 Sekunden Pause in Ha Noi
                           setTimeout(() => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
-                            map.setView([14, 115], 4); // Neuer Kartenausschnitt für Südostasien
+                            map.setView([14, 115], 4);
 
                             // Fahrzeug auf Flugzeug ändern
                             vehicle.setIcon(createVehicleIcon('plane'));
@@ -312,6 +312,7 @@
                                                 // Fähre von Boracay nach Caticlan
                                                 animateMovement(boracay[0], boracay[1], caticlan[0], caticlan[1], 2000, 'ferry', () => {
                                                   document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Hamburg!";
+                                                  map.setView([30, 60], 2.5); // Einheitlicher Kartenausschnitt wie beim Start
 
                                                   // Fahrzeug auf Flugzeug ändern
                                                   vehicle.setIcon(createVehicleIcon('plane'));
