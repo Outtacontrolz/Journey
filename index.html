@@ -74,6 +74,8 @@
     let vehicle;
     let animationId;
     let reiseData;
+    let isPaused = false;
+    let currentAnimation;
 
     // Koordinaten der Stopps
     const hamburg = [53.5511, 9.9937];
@@ -127,7 +129,7 @@
       .then(data => {
         reiseData = data.reisen[0];
         document.querySelector('.info p').textContent = "Bereit für den Start!";
-        document.getElementById('startButton').addEventListener('click', startAnimation);
+        document.getElementById('startButton').addEventListener('click', toggleAnimation);
       })
       .catch(error => {
         console.error("Fehler:", error);
@@ -156,6 +158,10 @@
       const startTime = performance.now();
 
       function animate(currentTime) {
+        if (isPaused) {
+          return;
+        }
+
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
@@ -171,14 +177,30 @@
         }
       }
 
-      requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
+    }
+
+    // Funktion zum Starten/Pausieren/Weiterführen der Animation
+    function toggleAnimation() {
+      const button = document.getElementById('startButton');
+
+      if (!currentAnimation) {
+        button.textContent = "Pause";
+        startAnimation();
+      } else if (isPaused) {
+        button.textContent = "Pause";
+        isPaused = false;
+        requestAnimationFrame(currentAnimation);
+      } else {
+        button.textContent = "Weiter";
+        isPaused = true;
+      }
     }
 
     // Funktion zum Starten der Animation
     function startAnimation() {
       document.querySelector('.info p').textContent = "Reise startet in 1 Sekunde!";
-      document.getElementById('startButton').textContent = "Reise läuft...";
-      document.getElementById('startButton').disabled = true;
+      document.getElementById('startButton').disabled = false;
 
       // 1 Sekunde Pause in Hamburg
       setTimeout(() => {
@@ -308,6 +330,8 @@
                                                   document.querySelector('.info p').textContent = "Reise abgeschlossen!";
                                                   document.getElementById('startButton').textContent = "Reise starten";
                                                   document.getElementById('startButton').disabled = false;
+                                                  isPaused = false;
+                                                  currentAnimation = null;
                                                 });
                                               });
                                             }, 2000); // 2 Sekunden Pause
