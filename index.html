@@ -81,8 +81,9 @@
     const daNang = [16.0471, 108.2062];
     const haNoi = [21.0285, 105.8542];
     const saPa = [22.3333, 103.85];
-    const siquijor = [9.2167, 123.5833];
+    const manila = [14.5995, 120.9842];
     const dumaguete = [9.3074, 123.3054];
+    const siquijor = [9.2167, 123.5833];
     const elNido = [11.1956, 119.4936];
     const caticlan = [11.9206, 121.9375];
     const boracay = [11.9667, 121.9333];
@@ -93,6 +94,8 @@
     L.marker(daNang).addTo(map).bindPopup("<b>Da Nang</b>");
     L.marker(haNoi).addTo(map).bindPopup("<b>Ha Noi</b>");
     L.marker(saPa).addTo(map).bindPopup("<b>Sa Pa</b>");
+    L.marker(manila).addTo(map).bindPopup("<b>Manila</b>");
+    L.marker(dumaguete).addTo(map).bindPopup("<b>Dumaguete</b>");
     L.marker(siquijor).addTo(map).bindPopup("<b>Siquijor</b>");
     L.marker(elNido).addTo(map).bindPopup("<b>El Nido</b>");
     L.marker(caticlan).addTo(map).bindPopup("<b>Caticlan</b>");
@@ -233,7 +236,7 @@
                           // Fahrzeug auf Flugzeug ändern
                           vehicle.setIcon(createVehicleIcon('plane'));
 
-                          // Flug von Ha Noi nach Manila (ohne Halt)
+                          // Flug von Ha Noi nach Manila
                           animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
                             map.setView([12, 122], 5);
