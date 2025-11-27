@@ -2,8 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Das Journey – Flug Hamburg → Vietnam</title>
+  <title>Das Journey – Reise durch Vietnam</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <style>
     body {
       margin: 0;
@@ -39,7 +40,7 @@
     }
     #startButton:hover { background: #45a049; }
     #startButton:disabled { background: #cccccc; }
-    .plane-icon {
+    .vehicle-icon {
       font-size: 24px;
       display: inline-block;
       transform-origin: center;
@@ -53,9 +54,9 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey 01</h3>
-    <p>Flugzeug bereit für den Start!</p>
-    <button id="startButton">Flug starten</button>
+    <h3>Das Journey</h3>
+    <p>Bereit für den Start!</p>
+    <button id="startButton">Reise starten</button>
   </div>
   <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -63,16 +64,45 @@
     // Karte initialisieren (globale Ansicht)
     const map = L.map('map', {
       attributionControl: false
-    }).setView([30, 60], 2.5); // Start mit globaler Ansicht
+    }).setView([30, 60], 2.5);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Variablen für Flugzeug und Animation
-    let plane;
+    // Variablen für Fahrzeug und Animation
+    let vehicle;
     let animationId;
     let reiseData;
+
+    // Koordinaten der Stopps
+    const hamburg = [53.5511, 9.9937];
+    const hoChiMinh = [10.8231, 106.6297];
+    const daNang = [16.0471, 108.2062];
+    const haNoi = [21.0285, 105.8542];
+    const saPa = [22.3333, 103.85];
+    const manila = [14.5995, 120.9842];
+    const dumaguete = [9.3074, 123.3054];
+
+    // Marker für Stopps
+    L.marker(hamburg).addTo(map).bindPopup("<b>Hamburg</b>");
+    L.marker(hoChiMinh).addTo(map).bindPopup("<b>Ho-Chi-Minh</b>");
+    L.marker(daNang).addTo(map).bindPopup("<b>Da Nang</b>");
+    L.marker(haNoi).addTo(map).bindPopup("<b>Ha Noi</b>");
+    L.marker(saPa).addTo(map).bindPopup("<b>Sa Pa</b>");
+    L.marker(dumaguete).addTo(map).bindPopup("<b>Dumaguete</b>");
+
+    // Fahrzeug-Icon (Flugzeug oder Bus)
+    function createVehicleIcon(vehicleType) {
+      return L.divIcon({
+        html: `<div class="vehicle-icon">${vehicleType === 'plane' ? '✈️' : '🚌'}</div>`,
+        iconSize: [30, 30],
+        className: 'vehicle-marker'
+      });
+    }
+
+    // Fahrzeug am Startpunkt platzieren
+    vehicle = L.marker(hamburg, { icon: createVehicleIcon('plane') }).addTo(map);
 
     // Flugdaten laden
     fetch('reisen.json')
@@ -80,37 +110,11 @@
       .then(data => {
         reiseData = data.reisen[0];
         document.querySelector('.info p').textContent = "Bereit für den Start!";
-
-        // Start- und Ziel-Marker
-        L.marker(reiseData.koordinaten[0]).addTo(map)
-          .bindPopup(`<b>${reiseData.start}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
-
-        // Koordinaten für Zwischenstopps
-        const hoChiMinh = [10.8231, 106.6297];
-        const daNang = [16.0471, 108.2062];
-        const haNoi = [21.0285, 105.8542];
-
-        // Marker für Zwischenstopps
-        L.marker(hoChiMinh).addTo(map).bindPopup("<b>Ho-Chi-Minh</b>");
-        L.marker(daNang).addTo(map).bindPopup("<b>Da Nang</b>");
-        L.marker(haNoi).addTo(map).bindPopup("<b>Ha Noi</b>");
-
-        // Flugzeug-Icon (als HTML-Element mit CSS-Rotation)
-        const planeIcon = L.divIcon({
-          html: '<div class="plane-icon">✈️</div>',
-          iconSize: [30, 30],
-          className: 'plane-marker'
-        });
-
-        // Flugzeug am Startpunkt platzieren
-        plane = L.marker(reiseData.koordinaten[0], { icon: planeIcon }).addTo(map);
-
-        // Button zum Starten der Animation
         document.getElementById('startButton').addEventListener('click', startAnimation);
       })
       .catch(error => {
         console.error("Fehler:", error);
-        document.querySelector('.info p').textContent = "Fehler beim Laden der Flugdaten!";
+        document.querySelector('.info p').textContent = "Fehler beim Laden der Daten!";
       });
 
     // Funktion zur Berechnung des Winkels zwischen zwei Koordinaten (in Grad)
@@ -124,11 +128,11 @@
       return bearing;
     }
 
-    // Funktion zum Animieren des Fluges zwischen zwei Punkten
-    function animateFlight(startLat, startLng, endLat, endLng, duration, callback) {
+    // Funktion zum Animieren der Bewegung zwischen zwei Punkten
+    function animateMovement(startLat, startLng, endLat, endLng, duration, vehicleType, callback) {
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
-      const planeElement = plane.getElement().querySelector('.plane-icon');
-      planeElement.style.transform = `rotate(${bearing}deg)`;
+      const vehicleElement = vehicle.getElement().querySelector('.vehicle-icon');
+      vehicleElement.style.transform = `rotate(${bearing}deg)`;
 
       const startTime = performance.now();
 
@@ -138,7 +142,7 @@
 
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
-        plane.setLatLng([newLat, newLng]);
+        vehicle.setLatLng([newLat, newLng]);
 
         if (progress < 1) {
           animationId = requestAnimationFrame(animate);
@@ -153,42 +157,74 @@
 
     // Funktion zum Starten der Animation
     function startAnimation() {
-      document.querySelector('.info p').textContent = "Flugzeug startet in 1 Sekunde!";
-      document.getElementById('startButton').textContent = "Flug läuft...";
+      document.querySelector('.info p').textContent = "Reise startet in 1 Sekunde!";
+      document.getElementById('startButton').textContent = "Reise läuft...";
       document.getElementById('startButton').disabled = true;
-
-      const startLat = reiseData.koordinaten[0][0];
-      const startLng = reiseData.koordinaten[0][1];
-
-      // Zwischenstopps
-      const hoChiMinh = [10.8231, 106.6297];
-      const daNang = [16.0471, 108.2062];
-      const haNoi = [21.0285, 105.8542];
 
       // 1 Sekunde Pause in Hamburg
       setTimeout(() => {
-        document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
+        document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ho-Chi-Minh!";
 
         // Flug von Hamburg nach Ho-Chi-Minh
-        animateFlight(startLat, startLng, hoChiMinh[0], hoChiMinh[1], 3000, () => {
+        animateMovement(hamburg[0], hamburg[1], hoChiMinh[0], hoChiMinh[1], 3000, 'plane', () => {
           document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ho-Chi-Minh!";
           map.setView(hoChiMinh, 6);
 
           // 2 Sekunden Pause in Ho-Chi-Minh
           setTimeout(() => {
+            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Da Nang!";
+
             // Flug von Ho-Chi-Minh nach Da Nang
-            animateFlight(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, () => {
+            animateMovement(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, 'plane', () => {
               document.querySelector('.info p').textContent = "2 Sekunden Stopp in Da Nang!";
-              map.setView(daNang, 6);
+              map.setView(daNang, 7); // Weiter reinzoomen auf 7
 
               // 2 Sekunden Pause in Da Nang
               setTimeout(() => {
-                // Flug von Da Nang nach Ha Noi
-                animateFlight(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, () => {
-                  document.querySelector('.info p').textContent = "Flug abgeschlossen in Ha Noi!";
-                  map.setView(haNoi, 6);
-                  document.getElementById('startButton').textContent = "Flug starten";
-                  document.getElementById('startButton').disabled = false;
+                document.querySelector('.info p').textContent = "Busfahrt nach Sa Pa!";
+
+                // Fahrzeug auf Bus ändern
+                vehicle.setIcon(createVehicleIcon('bus'));
+
+                // Busfahrt von Da Nang nach Ha Noi
+                animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
+                  document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
+
+                  // 2 Sekunden Pause in Ha Noi
+                  setTimeout(() => {
+                    document.querySelector('.info p').textContent = "Busfahrt nach Sa Pa!";
+
+                    // Busfahrt von Ha Noi nach Sa Pa
+                    animateMovement(haNoi[0], haNoi[1], saPa[0], saPa[1], 2000, 'bus', () => {
+                      document.querySelector('.info p').textContent = "2 Sekunden Stopp in Sa Pa!";
+
+                      // 2 Sekunden Pause in Sa Pa
+                      setTimeout(() => {
+                        document.querySelector('.info p').textContent = "Busfahrt zurück nach Ha Noi!";
+
+                        // Busfahrt von Sa Pa nach Ha Noi
+                        animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
+                          document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
+
+                          // Fahrzeug auf Flugzeug ändern
+                          vehicle.setIcon(createVehicleIcon('plane'));
+
+                          // Flug von Ha Noi nach Manila (ohne Halt)
+                          animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
+                            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
+
+                            // Flug von Manila nach Dumaguete
+                            animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
+                              document.querySelector('.info p').textContent = "Reise abgeschlossen in Dumaguete!";
+                              map.setView(dumaguete, 6);
+                              document.getElementById('startButton').textContent = "Reise starten";
+                              document.getElementById('startButton').disabled = false;
+                            });
+                          });
+                        });
+                      }, 2000); // 2 Sekunden Pause
+                    });
+                  }, 2000); // 2 Sekunden Pause
                 });
               }, 2000); // 2 Sekunden Pause
             });
