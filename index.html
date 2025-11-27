@@ -53,7 +53,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey 2</h3>
+    <h3>Das Journey 3</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
@@ -63,7 +63,7 @@
     // Karte initialisieren (globale Ansicht)
     const map = L.map('map', {
       attributionControl: false
-    }).setView([30, 60], 2); // Start mit globaler Ansicht
+    }).setView([30, 60], 2.5); // Start mit globaler Ansicht
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
