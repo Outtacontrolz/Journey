@@ -53,7 +53,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey 3</h3>
+    <h3>Das Journey</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
@@ -156,9 +156,15 @@
           if (easedProgress < 0.2) {
             map.setView([30, 60], 3);
           }
-          // Phase 2: 20-100% der Animation (Zoom auf Europa/Asien)
-          else {
+          // Phase 2: 20-80% der Animation (Zoom auf Europa/Asien)
+          else if (easedProgress >= 0.2 && easedProgress < 0.8) {
             map.setView([30, 60], 3);
+          }
+          // Phase 3: 80-100% der Animation (sanftes Reinzoomen auf Ho-Chi-Minh)
+          else {
+            const zoomProgress = (easedProgress - 0.8) / 0.2;
+            const zoomLevel = 3 + (zoomProgress * 2); // Sanftes Zoomen von 3 auf 5
+            map.setView([10.8231, 106.6297], zoomLevel, { animate: true });
           }
 
           if (easedProgress < 1) {
