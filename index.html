@@ -273,7 +273,7 @@
                           // 2 Sekunden Pause in Ha Noi
                           setTimeout(() => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
-                            map.setView([14, 115], 4);
+                            map.setView([16.28, 115], 6);
 
                             // Fahrzeug auf Flugzeug ändern
                             vehicle.setIcon(createVehicleIcon('plane'));
@@ -302,6 +302,7 @@
                                     // Fähre von Siquijor nach Dumaguete
                                     animateMovement(siquijor[0], siquijor[1], dumaguete[0], dumaguete[1], 2000, 'ferry', () => {
                                       document.querySelector('.info p').textContent = "Flugzeug unterwegs nach El Nido!";
+					map.setView([11.15, 121.55], 8);
 
                                       // Fahrzeug auf Flugzeug ändern
                                       vehicle.setIcon(createVehicleIcon('plane'));
