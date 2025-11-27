@@ -136,7 +136,7 @@
       setTimeout(() => {
         document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
 
-        // Animation mit den drei gewünschten Phasen
+        // Animation mit den gewünschten Phasen
         const totalDuration = 7000; // 7 Sekunden Gesamtzeit
         const startTime = performance.now();
 
@@ -156,15 +156,9 @@
           if (easedProgress < 0.2) {
             map.setView([30, 60], 3);
           }
-          // Phase 2: 20-80% der Animation (Zoom auf Europa/Asien)
-          else if (easedProgress >= 0.2 && easedProgress < 0.8) {
-            map.setView([30, 60], 3);
-          }
-          // Phase 3: 80-100% der Animation (geschmeidiger Zoom auf Vietnam)
+          // Phase 2: 20-100% der Animation (Zoom auf Europa/Asien)
           else {
-            const zoomProgress = (easedProgress - 0.8) / 0.2;
-            const zoomLevel = 3 + (zoomProgress * 3); // Geschmeidiger Zoom von 3 auf 6
-            map.setView([10.8231, 106.6297], zoomLevel, { animate: true });
+            map.setView([30, 60], 3);
           }
 
           if (easedProgress < 1) {
