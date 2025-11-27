@@ -114,16 +114,16 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit drei Phasen
-      const duration = 10000; // 10 Sekunden Gesamtzeit
+      // Animation mit erhöhter Geschwindigkeit
+      const duration = 6000; // 6 Sekunden Gesamtzeit (schneller als vorher)
       const startTime = performance.now();
 
       function animate(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // Beschleunigungskurve: Langsam starten, dann schneller werden
-        const easedProgress = progress < 0.5 ? 0.5 * Math.pow(progress * 2, 2) : 1 - 0.5 * Math.pow((1 - progress) * 2, 2);
+        // Beschleunigungskurve: Schneller starten, dann gleichmäßig weiter
+        const easedProgress = progress < 0.3 ? 1.5 * Math.pow(progress / 0.3, 2) : 1 - 0.5 * Math.pow((1 - progress) / 0.7, 2);
 
         const newLat = startLat + (endLat - startLat) * easedProgress;
         const newLng = startLng + (endLng - startLng) * easedProgress;
