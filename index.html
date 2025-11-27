@@ -60,6 +60,18 @@
     .leaflet-control-attribution {
       display: none !important;
     }
+    /* Stil für die Tooltips der Marker */
+    .leaflet-tooltip {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      color: blue;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .leaflet-tooltip:before {
+      border-bottom-color: transparent;
+    }
   </style>
 </head>
 <body>
@@ -98,24 +110,24 @@
     const saPa = [22.3333, 103.85];
     const manila = [14.5995, 120.9842];
     const dumaguete = [9.3074, 123.3054];
-    const cebu = [10.3157, 123.8854]; // Koordinaten für Cebu
+    const cebu = [10.3157, 123.8854];
     const siquijor = [9.2167, 123.5833];
     const elNido = [11.1956, 119.4936];
     const caticlan = [11.9206, 121.9375];
     const boracay = [11.9667, 121.9333];
-    // Marker für Stopps
-    L.marker(hamburg).addTo(map).bindPopup("<b>Hamburg</b>");
-    L.marker(hoChiMinh).addTo(map).bindPopup("<b>Ho-Chi-Minh</b>");
-    L.marker(daNang).addTo(map).bindPopup("<b>Da Nang</b>");
-    L.marker(haNoi).addTo(map).bindPopup("<b>Ha Noi</b>");
-    L.marker(saPa).addTo(map).bindPopup("<b>Sa Pa</b>");
-    L.marker(manila).addTo(map).bindPopup("<b>Manila</b>");
-    L.marker(dumaguete).addTo(map).bindPopup("<b>Dumaguete</b>");
-    L.marker(cebu).addTo(map).bindPopup("<b>Cebu</b>"); // Marker für Cebu
-    L.marker(siquijor).addTo(map).bindPopup("<b>Siquijor</b>");
-    L.marker(elNido).addTo(map).bindPopup("<b>El Nido</b>");
-    L.marker(caticlan).addTo(map).bindPopup("<b>Caticlan</b>");
-    L.marker(boracay).addTo(map).bindPopup("<b>Boracay</b>");
+    // Marker für Stopps mit dauerhaft sichtbaren blauen Tooltips
+    L.marker(hamburg).addTo(map).bindTooltip("Hamburg", { permanent: true, direction: 'top' });
+    L.marker(hoChiMinh).addTo(map).bindTooltip("Ho-Chi-Minh", { permanent: true, direction: 'top' });
+    L.marker(daNang).addTo(map).bindTooltip("Da Nang", { permanent: true, direction: 'top' });
+    L.marker(haNoi).addTo(map).bindTooltip("Ha Noi", { permanent: true, direction: 'top' });
+    L.marker(saPa).addTo(map).bindTooltip("Sa Pa", { permanent: true, direction: 'top' });
+    L.marker(manila).addTo(map).bindTooltip("Manila", { permanent: true, direction: 'top' });
+    L.marker(dumaguete).addTo(map).bindTooltip("Dumaguete", { permanent: true, direction: 'top' });
+    L.marker(cebu).addTo(map).bindTooltip("Cebu", { permanent: true, direction: 'top' });
+    L.marker(siquijor).addTo(map).bindTooltip("Siquijor", { permanent: true, direction: 'top' });
+    L.marker(elNido).addTo(map).bindTooltip("El Nido", { permanent: true, direction: 'top' });
+    L.marker(caticlan).addTo(map).bindTooltip("Caticlan", { permanent: true, direction: 'top' });
+    L.marker(boracay).addTo(map).bindTooltip("Boracay", { permanent: true, direction: 'top' });
     // Fahrzeug-Icon (Flugzeug, Bus oder Fähre)
     function createVehicleIcon(vehicleType) {
       let icon;
@@ -221,7 +233,7 @@
                             vehicle.setIcon(createVehicleIcon('plane'));
                             animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
                               document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
-                              map.setView([12, 122], 5);
+                              map.setView([16.28, 115], 6);
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
                                 document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
                                 map.setView([9.28, 123.41], 10);
