@@ -114,32 +114,29 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit angepasster Geschwindigkeit
-      const duration = 8000; // 8 Sekunden Gesamtzeit (langsamer als vorher)
+      // Animation mit flüssiger Bewegung
+      const duration = 8000; // 8 Sekunden Gesamtzeit
       const startTime = performance.now();
 
       function animate(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // Beschleunigungskurve: Langsamer starten, dann gleichmäßig weiter
-        const easedProgress = progress < 0.5 ? 1.2 * Math.pow(progress / 0.5, 2) : 1 - 0.3 * Math.pow((1 - progress) / 0.5, 2);
+        // Lineare Bewegung (ohne Beschleunigungskurve für gleichmäßige Geschwindigkeit)
+        const easedProgress = progress;
 
         const newLat = startLat + (endLat - startLat) * easedProgress;
         const newLng = startLng + (endLng - startLng) * easedProgress;
         plane.setLatLng([newLat, newLng]);
 
-        // Phase 1: Globale Karte (0-20% der Animation)
-        if (progress < 0.2) {
-          map.setView([30, 60], 2);
+        // Karte sanft der Flugzeugposition folgen lassen (ohne Hüpfen)
+        if (progress >= 0.2 && progress <= 0.8) {
+          map.panTo([newLat, newLng], { animate: false });
         }
-        // Phase 2: Flugroute über Europa/Asien (20-80% der Animation)
-        else if (progress >= 0.2 && progress < 0.8) {
-          map.setView([newLat, newLng], 3);
-        }
-        // Phase 3: Ankunft in Ho-Chi-Minh (80-100% der Animation)
-        else {
-          map.setView([10.8231, 106.6297], 6);
+
+        // Am Ende der Animation: Karte auf Ho-Chi-Minh zentrieren
+        if (progress === 1) {
+          map.setView([endLat, endLng], 6);
         }
 
         if (progress < 1) {
