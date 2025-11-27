@@ -53,17 +53,17 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey 05</h3>
+    <h3>Das Journey</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
   <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Karte initialisieren (globale Ansicht) – Zoom-Control ist aktiviert
+    // Karte initialisieren (globale Ansicht)
     const map = L.map('map', {
-      attributionControl: false // Nur Attribution deaktiviert, Zoom-Control bleibt aktiv
-    }).setView([30, 60], 3);
+      attributionControl: false // Nur Attribution deaktiviert
+    }).setView([53.5511, 9.9937], 5); // Start in Hamburg
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
@@ -118,7 +118,7 @@
 
     // Funktion zum Starten der Animation
     function startAnimation() {
-      document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
+      document.querySelector('.info p').textContent = "Flugzeug startet in 1 Sekunde!";
       document.getElementById('startButton').textContent = "Flug läuft...";
       document.getElementById('startButton').disabled = true;
 
@@ -132,43 +132,51 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit den drei gewünschten Phasen
-      const totalDuration = 6000; // 6 Sekunden Gesamtzeit
-      const startTime = performance.now();
+      // 1 Sekunde Pause in Hamburg
+      setTimeout(() => {
+        document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
 
-      function animate(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / totalDuration, 1);
+        // Animation mit den drei gewünschten Phasen
+        const totalDuration = 7000; // 7 Sekunden Gesamtzeit
+        const startTime = performance.now();
 
-        // Flugzeugposition berechnen
-        const newLat = startLat + (endLat - startLat) * progress;
-        const newLng = startLng + (endLng - startLng) * progress;
-        plane.setLatLng([newLat, newLng]);
+        function animate(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / totalDuration, 1);
 
-        // Phase 1: 0-20% der Animation (Weltkarte)
-        if (progress < 0.2) {
-          map.setView([30, 60], 3);
+          // Langsamere Bewegung am Ende
+          const easedProgress = progress < 0.8 ? progress * 1.25 : 0.8 * 1.25 + (progress - 0.8) * 0.5;
+
+          // Flugzeugposition berechnen
+          const newLat = startLat + (endLat - startLat) * easedProgress;
+          const newLng = startLng + (endLng - startLng) * easedProgress;
+          plane.setLatLng([newLat, newLng]);
+
+          // Phase 1: 0-20% der Animation (Weltkarte)
+          if (easedProgress < 0.2) {
+            map.setView([30, 60], 3);
+          }
+          // Phase 2: 20-80% der Animation (Zoom auf Europa/Asien)
+          else if (easedProgress >= 0.2 && easedProgress < 0.8) {
+            map.setView([30, 60], 3);
+          }
+          // Phase 3: 80-100% der Animation (Zoom auf Vietnam)
+          else {
+            map.setView([10.8231, 106.6297], 6);
+          }
+
+          if (easedProgress < 1) {
+            animationId = requestAnimationFrame(animate);
+          } else {
+            cancelAnimationFrame(animationId);
+            document.querySelector('.info p').textContent = "Flug abgeschlossen!";
+            document.getElementById('startButton').textContent = "Flug starten";
+            document.getElementById('startButton').disabled = false;
+          }
         }
-        // Phase 2: 20-80% der Animation (Zoom auf Europa/Asien)
-        else if (progress >= 0.2 && progress < 0.8) {
-          map.setView([45, 70], 3);
-        }
-        // Phase 3: 80-100% der Animation (Zoom auf Vietnam)
-        else {
-          map.setView([10.8231, 106.6297], 6);
-        }
 
-        if (progress < 1) {
-          animationId = requestAnimationFrame(animate);
-        } else {
-          cancelAnimationFrame(animationId);
-          document.querySelector('.info p').textContent = "Flug abgeschlossen!";
-          document.getElementById('startButton').textContent = "Flug starten";
-          document.getElementById('startButton').disabled = false;
-        }
-      }
-
-      requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
+      }, 1000); // 1 Sekunde Pause
     }
   </script>
 </body>
