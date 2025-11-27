@@ -286,6 +286,7 @@
                               // Flug von Manila nach Dumaguete
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
                                 document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
+				map.setView([9, 123], 11);
 
                                 // Fahrzeug auf Fähre ändern
                                 vehicle.setIcon(createVehicleIcon('ferry'));
