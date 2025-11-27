@@ -114,7 +114,7 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit präzisen Phasen
+      // Animation mit flüssigen Zooms
       const totalDuration = 8000; // 8 Sekunden Gesamtzeit
       const startTime = performance.now();
 
@@ -122,31 +122,26 @@
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / totalDuration, 1);
 
-        // Phase 1: 2 Sekunden globale Karte (0-25% der Animation)
-        if (progress < 0.25) {
-          const phaseProgress = progress / 0.25;
+        // Flugzeugposition berechnen
+        const newLat = startLat + (endLat - startLat) * progress;
+        const newLng = startLng + (endLng - startLng) * progress;
+        plane.setLatLng([newLat, newLng]);
+
+        // Phase 1: 0-30% der Animation (Weltkarte)
+        if (progress < 0.3) {
           map.setView([30, 60], 2);
         }
-        // Phase 2: 4 Sekunden Flug über Europa/Asien (25-75% der Animation)
-        else if (progress >= 0.25 && progress < 0.75) {
-          const phaseProgress = (progress - 0.25) / 0.5;
-          const newLat = startLat + (endLat - startLat) * 0.5 * phaseProgress;
-          const newLng = startLng + (endLng - startLng) * 0.5 * phaseProgress;
-          plane.setLatLng([newLat, newLng]);
-
-          // Sanft auf die Flugroute zoomen
-          const zoomLevel = 2 + (phaseProgress * 3); // Von Zoom 2 auf 5
-          map.setView([newLat, newLng], zoomLevel, { animate: false });
+        // Phase 2: 30-70% der Animation (Zoom auf Europa/Asien)
+        else if (progress >= 0.3 && progress < 0.7) {
+          const zoomProgress = (progress - 0.3) / 0.4; // Normalisierung auf 0-1 für diese Phase
+          const zoomLevel = 2 + (zoomProgress * 2); // Von Zoom 2 auf 4
+          map.setView([newLat, newLng], zoomLevel, { animate: true });
         }
-        // Phase 3: 2 Sekunden Ankunft in Vietnam (75-100% der Animation)
+        // Phase 3: 70-100% der Animation (Zoom auf Vietnam)
         else {
-          const phaseProgress = (progress - 0.75) / 0.25;
-          const newLat = startLat + (endLat - startLat) * (0.5 + 0.5 * phaseProgress);
-          const newLng = startLng + (endLng - startLng) * (0.5 + 0.5 * phaseProgress);
-          plane.setLatLng([newLat, newLng]);
-
-          // Langsameres Flugzeug am Ende
-          map.setView([10.8231, 106.6297], 6);
+          const zoomProgress = (progress - 0.7) / 0.3; // Normalisierung auf 0-1 für diese Phase
+          const zoomLevel = 4 + (zoomProgress * 2); // Von Zoom 4 auf 6
+          map.setView([newLat, newLng], zoomLevel, { animate: true });
         }
 
         if (progress < 1) {
