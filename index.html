@@ -98,6 +98,7 @@
     const saPa = [22.3333, 103.85];
     const manila = [14.5995, 120.9842];
     const dumaguete = [9.3074, 123.3054];
+    const cebu = [10.3157, 123.8854]; // Koordinaten für Cebu
     const siquijor = [9.2167, 123.5833];
     const elNido = [11.1956, 119.4936];
     const caticlan = [11.9206, 121.9375];
@@ -110,6 +111,7 @@
     L.marker(saPa).addTo(map).bindPopup("<b>Sa Pa</b>");
     L.marker(manila).addTo(map).bindPopup("<b>Manila</b>");
     L.marker(dumaguete).addTo(map).bindPopup("<b>Dumaguete</b>");
+    L.marker(cebu).addTo(map).bindPopup("<b>Cebu</b>"); // Marker für Cebu
     L.marker(siquijor).addTo(map).bindPopup("<b>Siquijor</b>");
     L.marker(elNido).addTo(map).bindPopup("<b>El Nido</b>");
     L.marker(caticlan).addTo(map).bindPopup("<b>Caticlan</b>");
@@ -229,33 +231,37 @@
                                   setTimeout(() => {
                                     document.querySelector('.info p').textContent = "Fähre zurück nach Dumaguete!";
                                     animateMovement(siquijor[0], siquijor[1], dumaguete[0], dumaguete[1], 2000, 'ferry', () => {
-                                      document.querySelector('.info p').textContent = "Flugzeug unterwegs nach El Nido!";
-                                      map.setView([11.15, 121.55], 8);
+                                      document.querySelector('.info p').textContent = "Flugzeug unterwegs nach El Nido (über Cebu)!";
+                                      map.setView([10.3, 123.9], 7);
                                       vehicle.setIcon(createVehicleIcon('plane'));
-                                      animateMovement(dumaguete[0], dumaguete[1], elNido[0], elNido[1], 2000, 'plane', () => {
-                                        document.querySelector('.info p').textContent = "2 Sekunden Stopp in El Nido!";
-                                        setTimeout(() => {
-                                          document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
-                                          animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
-                                            document.querySelector('.info p').textContent = "Fähre nach Boracay!";
-                                            vehicle.setIcon(createVehicleIcon('ferry'));
-                                            animateMovement(caticlan[0], caticlan[1], boracay[0], boracay[1], 2000, 'ferry', () => {
-                                              document.querySelector('.info p').textContent = "2 Sekunden Stopp in Boracay!";
-                                              setTimeout(() => {
-                                                document.querySelector('.info p').textContent = "Fähre zurück nach Caticlan!";
-                                                animateMovement(boracay[0], boracay[1], caticlan[0], caticlan[1], 2000, 'ferry', () => {
-                                                  document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Hamburg!";
-                                                  vehicle.setIcon(createVehicleIcon('plane'));
-                                                  map.setView([30, 60], 2.5);
-                                                  animateMovement(caticlan[0], caticlan[1], hamburg[0], hamburg[1], 8000, 'plane', () => {
-                                                    document.querySelector('.info p').textContent = "Reise abgeschlossen!";
-                                                    document.getElementById('startButton').disabled = false;
+                                      // Flug von Dumaguete nach Cebu (ohne Stopp)
+                                      animateMovement(dumaguete[0], dumaguete[1], cebu[0], cebu[1], 1000, 'plane', () => {
+                                        // Flug von Cebu nach El Nido (ohne Stopp)
+                                        animateMovement(cebu[0], cebu[1], elNido[0], elNido[1], 1500, 'plane', () => {
+                                          document.querySelector('.info p').textContent = "2 Sekunden Stopp in El Nido!";
+                                          setTimeout(() => {
+                                            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
+                                            animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
+                                              document.querySelector('.info p').textContent = "Fähre nach Boracay!";
+                                              vehicle.setIcon(createVehicleIcon('ferry'));
+                                              animateMovement(caticlan[0], caticlan[1], boracay[0], boracay[1], 2000, 'ferry', () => {
+                                                document.querySelector('.info p').textContent = "2 Sekunden Stopp in Boracay!";
+                                                setTimeout(() => {
+                                                  document.querySelector('.info p').textContent = "Fähre zurück nach Caticlan!";
+                                                  animateMovement(boracay[0], boracay[1], caticlan[0], caticlan[1], 2000, 'ferry', () => {
+                                                    document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Hamburg!";
+                                                    vehicle.setIcon(createVehicleIcon('plane'));
+                                                    map.setView([30, 60], 2.5);
+                                                    animateMovement(caticlan[0], caticlan[1], hamburg[0], hamburg[1], 8000, 'plane', () => {
+                                                      document.querySelector('.info p').textContent = "Reise abgeschlossen!";
+                                                      document.getElementById('startButton').disabled = false;
+                                                    });
                                                   });
-                                                });
-                                              }, 2000);
+                                                }, 2000);
+                                              });
                                             });
-                                          });
-                                        }, 2000);
+                                          }, 2000);
+                                        });
                                       });
                                     });
                                   }, 2000);
