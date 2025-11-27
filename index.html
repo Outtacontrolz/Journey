@@ -224,12 +224,12 @@
               // 2 Sekunden Pause in Da Nang
               setTimeout(() => {
                 document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ha Noi!";
-                map.setView([16.5, 107.5], 6);
+                map.setView([18, 106], 5);
 
                 // Flug von Da Nang nach Ha Noi
                 animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, 'plane', () => {
                   document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
-                  map.setView([21.5, 104.5], 7); // Weiter reingezoomt vor der Busfahrt nach Sa Pa
+                  map.setView([21.5, 104.5], 7);
 
                   // 2 Sekunden Pause in Ha Noi
                   setTimeout(() => {
@@ -254,7 +254,7 @@
                           // 2 Sekunden Pause in Ha Noi
                           setTimeout(() => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
-                            map.setView([16, 120], 4);
+                            map.setView([14, 115], 4); // Neuer Kartenausschnitt für Südostasien
 
                             // Fahrzeug auf Flugzeug ändern
                             vehicle.setIcon(createVehicleIcon('plane'));
