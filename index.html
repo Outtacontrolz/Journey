@@ -48,27 +48,21 @@
     .leaflet-control-attribution {
       display: none !important;
     }
-    /* Entfernt Leaflet-Zoom-Control */
-    .leaflet-control-zoom {
-      display: none !important;
-    }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey 04</h3>
+    <h3>Das Journey 05</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
-
   <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Karte initialisieren (globale Ansicht)
+    // Karte initialisieren (globale Ansicht) – Zoom-Control ist aktiviert
     const map = L.map('map', {
-      zoomControl: false,
-      attributionControl: false
+      attributionControl: false // Nur Attribution deaktiviert, Zoom-Control bleibt aktiv
     }).setView([30, 60], 3);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
