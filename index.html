@@ -114,7 +114,7 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit flüssigen Zooms
+      // Animation mit zwei Zooms
       const totalDuration = 8000; // 8 Sekunden Gesamtzeit
       const startTime = performance.now();
 
@@ -127,21 +127,19 @@
         const newLng = startLng + (endLng - startLng) * progress;
         plane.setLatLng([newLat, newLng]);
 
-        // Phase 1: 0-30% der Animation (Weltkarte)
-        if (progress < 0.3) {
+        // Phase 1: 0-12.5% der Animation (kurze globale Weltkarte)
+        if (progress < 0.125) {
           map.setView([30, 60], 2);
         }
-        // Phase 2: 30-70% der Animation (Zoom auf Europa/Asien)
-        else if (progress >= 0.3 && progress < 0.7) {
-          const zoomProgress = (progress - 0.3) / 0.4; // Normalisierung auf 0-1 für diese Phase
-          const zoomLevel = 2 + (zoomProgress * 2); // Von Zoom 2 auf 4
-          map.setView([newLat, newLng], zoomLevel, { animate: true });
+        // Phase 2: 12.5-87.5% der Animation (Zoom auf Europa/Asien)
+        else if (progress >= 0.125 && progress < 0.875) {
+          map.setView([45, 70], 3);
         }
-        // Phase 3: 70-100% der Animation (Zoom auf Vietnam)
+        // Phase 3: 87.5-100% der Animation (Zoom auf Vietnam)
         else {
-          const zoomProgress = (progress - 0.7) / 0.3; // Normalisierung auf 0-1 für diese Phase
-          const zoomLevel = 4 + (zoomProgress * 2); // Von Zoom 4 auf 6
-          map.setView([newLat, newLng], zoomLevel, { animate: true });
+          const zoomProgress = (progress - 0.875) / 0.125; // Normalisierung auf 0-1 für diese Phase
+          const zoomLevel = 3 + (zoomProgress * 3); // Von Zoom 3 auf 6
+          map.setView([10.8231, 106.6297], zoomLevel, { animate: true });
         }
 
         if (progress < 1) {
