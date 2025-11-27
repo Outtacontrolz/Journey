@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Das Journey – Flug Hamburg → Ho-Chi-Minh</title>
+  <title>Das Journey – Flug Hamburg → Vietnam</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
     body {
@@ -53,7 +53,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey</h3>
+    <h3>Das Journey 01</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
@@ -84,8 +84,16 @@
         // Start- und Ziel-Marker
         L.marker(reiseData.koordinaten[0]).addTo(map)
           .bindPopup(`<b>${reiseData.start}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
-        L.marker(reiseData.koordinaten[1]).addTo(map)
-          .bindPopup(`<b>${reiseData.ziel}</b><br>${reiseData.datum}<br>${reiseData.beschreibung}`);
+
+        // Koordinaten für Zwischenstopps
+        const hoChiMinh = [10.8231, 106.6297];
+        const daNang = [16.0471, 108.2062];
+        const haNoi = [21.0285, 105.8542];
+
+        // Marker für Zwischenstopps
+        L.marker(hoChiMinh).addTo(map).bindPopup("<b>Ho-Chi-Minh</b>");
+        L.marker(daNang).addTo(map).bindPopup("<b>Da Nang</b>");
+        L.marker(haNoi).addTo(map).bindPopup("<b>Ha Noi</b>");
 
         // Flugzeug-Icon (als HTML-Element mit CSS-Rotation)
         const planeIcon = L.divIcon({
@@ -116,6 +124,33 @@
       return bearing;
     }
 
+    // Funktion zum Animieren des Fluges zwischen zwei Punkten
+    function animateFlight(startLat, startLng, endLat, endLng, duration, callback) {
+      const bearing = calculateBearing(startLat, startLng, endLat, endLng);
+      const planeElement = plane.getElement().querySelector('.plane-icon');
+      planeElement.style.transform = `rotate(${bearing}deg)`;
+
+      const startTime = performance.now();
+
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const newLat = startLat + (endLat - startLat) * progress;
+        const newLng = startLng + (endLng - startLng) * progress;
+        plane.setLatLng([newLat, newLng]);
+
+        if (progress < 1) {
+          animationId = requestAnimationFrame(animate);
+        } else {
+          cancelAnimationFrame(animationId);
+          if (callback) callback();
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
     // Funktion zum Starten der Animation
     function startAnimation() {
       document.querySelector('.info p').textContent = "Flugzeug startet in 1 Sekunde!";
@@ -124,57 +159,41 @@
 
       const startLat = reiseData.koordinaten[0][0];
       const startLng = reiseData.koordinaten[0][1];
-      const endLat = reiseData.koordinaten[1][0];
-      const endLng = reiseData.koordinaten[1][1];
-      const bearing = calculateBearing(startLat, startLng, endLat, endLng);
 
-      // Flugzeug drehen
-      const planeElement = plane.getElement().querySelector('.plane-icon');
-      planeElement.style.transform = `rotate(${bearing}deg)`;
+      // Zwischenstopps
+      const hoChiMinh = [10.8231, 106.6297];
+      const daNang = [16.0471, 108.2062];
+      const haNoi = [21.0285, 105.8542];
 
       // 1 Sekunde Pause in Hamburg
       setTimeout(() => {
         document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
 
-        // Animation mit den gewünschten Phasen
-        const totalDuration = 7000; // 7 Sekunden Gesamtzeit
-        const startTime = performance.now();
+        // Flug von Hamburg nach Ho-Chi-Minh
+        animateFlight(startLat, startLng, hoChiMinh[0], hoChiMinh[1], 3000, () => {
+          document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ho-Chi-Minh!";
+          map.setView(hoChiMinh, 6);
 
-        function animate(currentTime) {
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / totalDuration, 1);
+          // 2 Sekunden Pause in Ho-Chi-Minh
+          setTimeout(() => {
+            // Flug von Ho-Chi-Minh nach Da Nang
+            animateFlight(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, () => {
+              document.querySelector('.info p').textContent = "2 Sekunden Stopp in Da Nang!";
+              map.setView(daNang, 6);
 
-          // Langsamere Bewegung am Ende
-          const easedProgress = progress < 0.85 ? progress * 1.18 : 0.85 * 1.18 + (progress - 0.85) * 0.3;
-
-          // Flugzeugposition berechnen
-          const newLat = startLat + (endLat - startLat) * easedProgress;
-          const newLng = startLng + (endLng - startLng) * easedProgress;
-          plane.setLatLng([newLat, newLng]);
-
-          // Phase 1: 0-20% der Animation (Weltkarte)
-          if (easedProgress < 0.2) {
-            map.setView([30, 60], 3);
-          }
-          // Phase 2: 20-100% der Animation (Zoom auf Europa/Asien)
-          else {
-            map.setView([30, 60], 3);
-          }
-
-          if (easedProgress < 1) {
-            animationId = requestAnimationFrame(animate);
-          } else {
-            cancelAnimationFrame(animationId);
-            document.querySelector('.info p').textContent = "Flug abgeschlossen!";
-            document.getElementById('startButton').textContent = "Flug starten";
-            document.getElementById('startButton').disabled = false;
-
-            // Zoom auf Ho-Chi-Minh nach der Landung
-            map.setView([10.8231, 106.6297], 7);
-          }
-        }
-
-        requestAnimationFrame(animate);
+              // 2 Sekunden Pause in Da Nang
+              setTimeout(() => {
+                // Flug von Da Nang nach Ha Noi
+                animateFlight(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, () => {
+                  document.querySelector('.info p').textContent = "Flug abgeschlossen in Ha Noi!";
+                  map.setView(haNoi, 6);
+                  document.getElementById('startButton').textContent = "Flug starten";
+                  document.getElementById('startButton').disabled = false;
+                });
+              }, 2000); // 2 Sekunden Pause
+            });
+          }, 2000); // 2 Sekunden Pause
+        });
       }, 1000); // 1 Sekunde Pause
     }
   </script>
