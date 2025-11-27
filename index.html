@@ -38,7 +38,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey 01</h3>
+    <h3>Das Journey 02</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
@@ -115,7 +115,7 @@
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
       // Animation mit langsamen, flüssigen Zooms
-      const totalDuration = 10000; // 10 Sekunden Gesamtzeit
+      const totalDuration = 5000; // 5 Sekunden Gesamtzeit
       const startTime = performance.now();
 
       function animate(currentTime) {
