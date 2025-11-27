@@ -62,8 +62,8 @@
   <script>
     // Karte initialisieren (globale Ansicht)
     const map = L.map('map', {
-      attributionControl: false // Nur Attribution deaktiviert
-    }).setView([53.5511, 9.9937], 5); // Start in Hamburg
+      attributionControl: false
+    }).setView([30, 60], 3); // Start mit globaler Ansicht
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
@@ -145,7 +145,7 @@
           const progress = Math.min(elapsed / totalDuration, 1);
 
           // Langsamere Bewegung am Ende
-          const easedProgress = progress < 0.8 ? progress * 1.25 : 0.8 * 1.25 + (progress - 0.8) * 0.5;
+          const easedProgress = progress < 0.85 ? progress * 1.18 : 0.85 * 1.18 + (progress - 0.85) * 0.3;
 
           // Flugzeugposition berechnen
           const newLat = startLat + (endLat - startLat) * easedProgress;
@@ -158,11 +158,13 @@
           }
           // Phase 2: 20-80% der Animation (Zoom auf Europa/Asien)
           else if (easedProgress >= 0.2 && easedProgress < 0.8) {
-            map.setView([30, 60], 3);
+            map.setView([45, 70], 3);
           }
-          // Phase 3: 80-100% der Animation (Zoom auf Vietnam)
+          // Phase 3: 80-100% der Animation (geschmeidiger Zoom auf Vietnam)
           else {
-            map.setView([10.8231, 106.6297], 6);
+            const zoomProgress = (easedProgress - 0.8) / 0.2;
+            const zoomLevel = 3 + (zoomProgress * 3); // Geschmeidiger Zoom von 3 auf 6
+            map.setView([10.8231, 106.6297], zoomLevel, { animate: true });
           }
 
           if (easedProgress < 1) {
