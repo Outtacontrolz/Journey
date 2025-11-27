@@ -62,15 +62,17 @@
     }
     /* Stil für die Tooltips der Marker */
     .leaflet-tooltip {
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      color: blue;
+      background-color: blue;
+      color: white;
+      border: 2px solid darkblue;
+      border-radius: 4px;
       font-weight: bold;
       font-size: 14px;
+      padding: 4px 8px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
     }
     .leaflet-tooltip:before {
-      border-bottom-color: transparent;
+      border-bottom-color: blue;
     }
   </style>
 </head>
@@ -115,7 +117,7 @@
     const elNido = [11.1956, 119.4936];
     const caticlan = [11.9206, 121.9375];
     const boracay = [11.9667, 121.9333];
-    // Marker für Stopps mit dauerhaft sichtbaren blauen Tooltips
+    // Marker für Stopps mit dauerhaft sichtbaren Tooltips
     L.marker(hamburg).addTo(map).bindTooltip("Hamburg", { permanent: true, direction: 'top' });
     L.marker(hoChiMinh).addTo(map).bindTooltip("Ho-Chi-Minh", { permanent: true, direction: 'top' });
     L.marker(daNang).addTo(map).bindTooltip("Da Nang", { permanent: true, direction: 'top' });
@@ -233,7 +235,7 @@
                             vehicle.setIcon(createVehicleIcon('plane'));
                             animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
                               document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
-                              map.setView([16.28, 115], 6);
+                              map.setView([12, 122], 5);
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
                                 document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
                                 map.setView([9.28, 123.41], 10);
