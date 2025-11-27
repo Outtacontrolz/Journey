@@ -114,33 +114,38 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit flüssiger Bewegung und Zoom
-      const duration = 8000; // 8 Sekunden Gesamtzeit
+      // Animation mit präzisen Phasen
+      const totalDuration = 8000; // 8 Sekunden Gesamtzeit
       const startTime = performance.now();
 
       function animate(currentTime) {
         const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+        const progress = Math.min(elapsed / totalDuration, 1);
 
-        // Lineare Bewegung
-        const easedProgress = progress;
-
-        const newLat = startLat + (endLat - startLat) * easedProgress;
-        const newLng = startLng + (endLng - startLng) * easedProgress;
-        plane.setLatLng([newLat, newLng]);
-
-        // Phase 1: Globale Karte (0-20% der Animation)
-        if (progress < 0.2) {
+        // Phase 1: 2 Sekunden globale Karte (0-25% der Animation)
+        if (progress < 0.25) {
+          const phaseProgress = progress / 0.25;
           map.setView([30, 60], 2);
         }
-        // Phase 2: Flugroute über Europa/Asien (20-80% der Animation)
-        else if (progress >= 0.2 && progress < 0.8) {
+        // Phase 2: 4 Sekunden Flug über Europa/Asien (25-75% der Animation)
+        else if (progress >= 0.25 && progress < 0.75) {
+          const phaseProgress = (progress - 0.25) / 0.5;
+          const newLat = startLat + (endLat - startLat) * 0.5 * phaseProgress;
+          const newLng = startLng + (endLng - startLng) * 0.5 * phaseProgress;
+          plane.setLatLng([newLat, newLng]);
+
           // Sanft auf die Flugroute zoomen
-          const zoomLevel = 2 + (progress - 0.2) * 3.75; // Von Zoom 2 auf 5
+          const zoomLevel = 2 + (phaseProgress * 3); // Von Zoom 2 auf 5
           map.setView([newLat, newLng], zoomLevel, { animate: false });
         }
-        // Phase 3: Ankunft in Ho-Chi-Minh (80-100% der Animation)
+        // Phase 3: 2 Sekunden Ankunft in Vietnam (75-100% der Animation)
         else {
+          const phaseProgress = (progress - 0.75) / 0.25;
+          const newLat = startLat + (endLat - startLat) * (0.5 + 0.5 * phaseProgress);
+          const newLng = startLng + (endLng - startLng) * (0.5 + 0.5 * phaseProgress);
+          plane.setLatLng([newLat, newLng]);
+
+          // Langsameres Flugzeug am Ende
           map.setView([10.8231, 106.6297], 6);
         }
 
