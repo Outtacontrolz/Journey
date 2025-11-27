@@ -210,7 +210,7 @@
         // Flug von Hamburg nach Ho-Chi-Minh
         animateMovement(hamburg[0], hamburg[1], hoChiMinh[0], hoChiMinh[1], 3000, 'plane', () => {
           document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ho-Chi-Minh!";
-          map.setView([13, 108], 8);
+          map.setView([13, 108], 6);
 
           // 2 Sekunden Pause in Ho-Chi-Minh
           setTimeout(() => {
@@ -246,7 +246,7 @@
                         // Busfahrt von Sa Pa nach Ha Noi
                         animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
                           document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
-                          map.setView([16, 120], 4);
+                          map.setView([16, 120], 6);
 
                           // Fahrzeug auf Flugzeug ändern
                           vehicle.setIcon(createVehicleIcon('plane'));
@@ -254,7 +254,7 @@
                           // Flug von Ha Noi nach Manila
                           animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
-                            map.setView([12, 122], 5);
+                            map.setView([12, 122], 7);
 
                             // Flug von Manila nach Dumaguete
                             animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
