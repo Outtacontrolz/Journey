@@ -62,9 +62,9 @@
     }
     /* Stil für die Tooltips der Marker */
     .leaflet-tooltip {
-      background-color: blue;
+      background-color: #3388ff; /* Exakt die Farbe der Leaflet-Marker-Tropfen */
       color: white;
-      border: 2px solid darkblue;
+      border: 2px solid #2a77f4;
       border-radius: 4px;
       font-weight: bold;
       font-size: 14px;
@@ -72,7 +72,7 @@
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
     }
     .leaflet-tooltip:before {
-      border-bottom-color: blue;
+      border-bottom-color: #3388ff;
     }
   </style>
 </head>
@@ -117,19 +117,21 @@
     const elNido = [11.1956, 119.4936];
     const caticlan = [11.9206, 121.9375];
     const boracay = [11.9667, 121.9333];
-    // Marker für Stopps mit dauerhaft sichtbaren Tooltips
-    L.marker(hamburg).addTo(map).bindTooltip("Hamburg", { permanent: true, direction: 'top' });
-    L.marker(hoChiMinh).addTo(map).bindTooltip("Ho-Chi-Minh", { permanent: true, direction: 'top' });
-    L.marker(daNang).addTo(map).bindTooltip("Da Nang", { permanent: true, direction: 'top' });
-    L.marker(haNoi).addTo(map).bindTooltip("Ha Noi", { permanent: true, direction: 'top' });
-    L.marker(saPa).addTo(map).bindTooltip("Sa Pa", { permanent: true, direction: 'top' });
-    L.marker(manila).addTo(map).bindTooltip("Manila", { permanent: true, direction: 'top' });
-    L.marker(dumaguete).addTo(map).bindTooltip("Dumaguete", { permanent: true, direction: 'top' });
-    L.marker(cebu).addTo(map).bindTooltip("Cebu", { permanent: true, direction: 'top' });
-    L.marker(siquijor).addTo(map).bindTooltip("Siquijor", { permanent: true, direction: 'top' });
-    L.marker(elNido).addTo(map).bindTooltip("El Nido", { permanent: true, direction: 'top' });
-    L.marker(caticlan).addTo(map).bindTooltip("Caticlan", { permanent: true, direction: 'top' });
-    L.marker(boracay).addTo(map).bindTooltip("Boracay", { permanent: true, direction: 'top' });
+    // Marker für Stopps (ohne Tooltips)
+    const markers = {
+      hamburg: L.marker(hamburg).addTo(map),
+      hoChiMinh: L.marker(hoChiMinh).addTo(map),
+      daNang: L.marker(daNang).addTo(map),
+      haNoi: L.marker(haNoi).addTo(map),
+      saPa: L.marker(saPa).addTo(map),
+      manila: L.marker(manila).addTo(map),
+      dumaguete: L.marker(dumaguete).addTo(map),
+      cebu: L.marker(cebu).addTo(map),
+      siquijor: L.marker(siquijor).addTo(map),
+      elNido: L.marker(elNido).addTo(map),
+      caticlan: L.marker(caticlan).addTo(map),
+      boracay: L.marker(boracay).addTo(map)
+    };
     // Fahrzeug-Icon (Flugzeug, Bus oder Fähre)
     function createVehicleIcon(vehicleType) {
       let icon;
@@ -148,6 +150,21 @@
     }
     // Fahrzeug am Startpunkt platzieren
     vehicle = L.marker(hamburg, { icon: createVehicleIcon('plane') }).addTo(map);
+    // Funktion, um Tooltips in der Nähe des Fahrzeugs anzuzeigen
+    function showNearbyCityNames(lat, lng) {
+      Object.entries(markers).forEach(([city, marker]) => {
+        const distance = Math.sqrt(Math.pow(lat - marker.getLatLng().lat, 2) + Math.pow(lng - marker.getLatLng().lng, 2));
+        if (distance < 5) { // Radius von 5°
+          if (!marker.getTooltip()) {
+            marker.bindTooltip(city.replace(/([A-Z])/g, ' $1').trim(), { permanent: true, direction: 'top' }).openTooltip();
+          }
+        } else {
+          if (marker.getTooltip()) {
+            marker.unbindTooltip();
+          }
+        }
+      });
+    }
     // Flugdaten laden
     fetch('reisen.json')
       .then(response => response.json())
@@ -184,6 +201,7 @@
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
+        showNearbyCityNames(newLat, newLng); // Zeige Stadtnamen in der Nähe
         if (progress < 1) {
           animationId = requestAnimationFrame(animate);
         } else {
