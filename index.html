@@ -53,7 +53,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey</h3>
+    <h3>Das Journey01</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
@@ -63,7 +63,7 @@
     // Karte initialisieren (globale Ansicht)
     const map = L.map('map', {
       attributionControl: false
-    }).setView([30, 60], 3); // Start mit globaler Ansicht
+    }).setView([30, 60], 2); // Start mit globaler Ansicht
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
@@ -158,7 +158,7 @@
           }
           // Phase 2: 20-80% der Animation (Zoom auf Europa/Asien)
           else if (easedProgress >= 0.2 && easedProgress < 0.8) {
-            map.setView([45, 70], 3);
+            map.setView([30, 60], 3);
           }
           // Phase 3: 80-100% der Animation (geschmeidiger Zoom auf Vietnam)
           else {
