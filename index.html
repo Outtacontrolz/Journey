@@ -77,25 +77,19 @@
     const map = L.map('map', {
       attributionControl: false
     }).setView([30, 60], 2.5);
-
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
-
     // Aktuelle Koordinaten und Zoom-Level anzeigen
     map.on('moveend', function() {
       const center = map.getCenter();
       const zoom = map.getZoom();
       document.getElementById('coordinates').textContent = `Lat: ${center.lat.toFixed(4)}, Lng: ${center.lng.toFixed(4)}, Zoom: ${zoom}`;
     });
-
     // Variablen für Fahrzeug und Animation
     let vehicle;
     let animationId;
     let reiseData;
-    let isPaused = false;
-    let currentAnimation;
-
     // Koordinaten der Stopps
     const hamburg = [53.5511, 9.9937];
     const hoChiMinh = [10.8231, 106.6297];
@@ -108,7 +102,6 @@
     const elNido = [11.1956, 119.4936];
     const caticlan = [11.9206, 121.9375];
     const boracay = [11.9667, 121.9333];
-
     // Marker für Stopps
     L.marker(hamburg).addTo(map).bindPopup("<b>Hamburg</b>");
     L.marker(hoChiMinh).addTo(map).bindPopup("<b>Ho-Chi-Minh</b>");
@@ -121,7 +114,6 @@
     L.marker(elNido).addTo(map).bindPopup("<b>El Nido</b>");
     L.marker(caticlan).addTo(map).bindPopup("<b>Caticlan</b>");
     L.marker(boracay).addTo(map).bindPopup("<b>Boracay</b>");
-
     // Fahrzeug-Icon (Flugzeug, Bus oder Fähre)
     function createVehicleIcon(vehicleType) {
       let icon;
@@ -138,10 +130,8 @@
         className: 'vehicle-marker'
       });
     }
-
     // Fahrzeug am Startpunkt platzieren
     vehicle = L.marker(hamburg, { icon: createVehicleIcon('plane') }).addTo(map);
-
     // Flugdaten laden
     fetch('reisen.json')
       .then(response => response.json())
@@ -154,7 +144,6 @@
         console.error("Fehler:", error);
         document.querySelector('.info p').textContent = "Fehler beim Laden der Daten!";
       });
-
     // Funktion zur Berechnung des Winkels zwischen zwei Koordinaten (in Grad)
     function calculateBearing(lat1, lng1, lat2, lng2) {
       const dLng = lng2 - lng1;
@@ -165,7 +154,6 @@
       bearing = (bearing + 360) % 360; // Normalisierung auf 0-360°
       return bearing;
     }
-
     // Funktion zum Animieren der Bewegung zwischen zwei Punkten
     function animateMovement(startLat, startLng, endLat, endLng, duration, vehicleType, callback) {
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
@@ -173,21 +161,13 @@
       if (vehicleElement) {
         vehicleElement.style.transform = `rotate(${bearing}deg)`;
       }
-
       const startTime = performance.now();
-
       function animate(currentTime) {
-        if (isPaused) {
-          return;
-        }
-
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
-
         if (progress < 1) {
           animationId = requestAnimationFrame(animate);
         } else {
@@ -195,179 +175,104 @@
           if (callback) callback();
         }
       }
-
       animationId = requestAnimationFrame(animate);
     }
-
-    // Funktion zum Starten/Pausieren/Weiterführen der Animation
+    // Funktion zum Starten der Animation
     function toggleAnimation() {
       const button = document.getElementById('startButton');
-
-      if (!currentAnimation) {
-        button.textContent = "Pause";
-        startAnimation();
-      } else if (isPaused) {
-        button.textContent = "Pause";
-        isPaused = false;
-        requestAnimationFrame(currentAnimation);
-      } else {
-        button.textContent = "Weiter";
-        isPaused = true;
-      }
+      button.disabled = true;
+      startAnimation();
     }
-
     // Funktion zum Starten der Animation
     function startAnimation() {
       document.querySelector('.info p').textContent = "Reise startet in 1 Sekunde!";
-      document.getElementById('startButton').disabled = false;
-
-      // 1 Sekunde Pause in Hamburg
       setTimeout(() => {
         document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ho-Chi-Minh!";
         map.setView([30, 60], 2.5);
-
-        // Flug von Hamburg nach Ho-Chi-Minh
         animateMovement(hamburg[0], hamburg[1], hoChiMinh[0], hoChiMinh[1], 3000, 'plane', () => {
           document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ho-Chi-Minh!";
           map.setView([13, 108], 5);
-
-          // 2 Sekunden Pause in Ho-Chi-Minh
           setTimeout(() => {
             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Da Nang!";
             map.setView([16.5, 107.5], 6);
-
-            // Flug von Ho-Chi-Minh nach Da Nang
             animateMovement(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, 'plane', () => {
               document.querySelector('.info p').textContent = "2 Sekunden Stopp in Da Nang!";
-
-              // 2 Sekunden Pause in Da Nang
               setTimeout(() => {
                 document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ha Noi!";
                 map.setView([16.5, 107.5], 6);
-
-                // Flug von Da Nang nach Ha Noi
                 animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, 'plane', () => {
                   document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
                   map.setView([21.5, 104.5], 7);
-
-                  // 2 Sekunden Pause in Ha Noi
                   setTimeout(() => {
                     document.querySelector('.info p').textContent = "Busfahrt nach Sa Pa!";
-
-                    // Fahrzeug auf Bus ändern
                     vehicle.setIcon(createVehicleIcon('bus'));
-
-                    // Busfahrt von Ha Noi nach Sa Pa
                     animateMovement(haNoi[0], haNoi[1], saPa[0], saPa[1], 2000, 'bus', () => {
                       document.querySelector('.info p').textContent = "2 Sekunden Stopp in Sa Pa!";
-
-                      // 2 Sekunden Pause in Sa Pa
                       setTimeout(() => {
                         document.querySelector('.info p').textContent = "Busfahrt zurück nach Ha Noi!";
                         map.setView([21.5, 104.5], 7);
-
-                        // Busfahrt von Sa Pa nach Ha Noi
                         animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
                           document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
-
-                          // 2 Sekunden Pause in Ha Noi
                           setTimeout(() => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
                             map.setView([16.28, 115], 6);
-
-                            // Fahrzeug auf Flugzeug ändern
                             vehicle.setIcon(createVehicleIcon('plane'));
-
-                            // Flug von Ha Noi nach Manila
                             animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
                               document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
                               map.setView([12, 122], 5);
-
-                              // Flug von Manila nach Dumaguete
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
                                 document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
-				map.setView([9.28, 123.41], 10);
-
-                                // Fahrzeug auf Fähre ändern
+                                map.setView([9.28, 123.41], 10);
                                 vehicle.setIcon(createVehicleIcon('ferry'));
-
-                                // Fähre von Dumaguete nach Siquijor
                                 animateMovement(dumaguete[0], dumaguete[1], siquijor[0], siquijor[1], 2000, 'ferry', () => {
                                   document.querySelector('.info p').textContent = "2 Sekunden Stopp in Siquijor!";
-
-                                  // 2 Sekunden Pause in Siquijor
                                   setTimeout(() => {
                                     document.querySelector('.info p').textContent = "Fähre zurück nach Dumaguete!";
-
-                                    // Fähre von Siquijor nach Dumaguete
                                     animateMovement(siquijor[0], siquijor[1], dumaguete[0], dumaguete[1], 2000, 'ferry', () => {
                                       document.querySelector('.info p').textContent = "Flugzeug unterwegs nach El Nido!";
-					map.setView([11.15, 121.55], 8);
-
-                                      // Fahrzeug auf Flugzeug ändern
+                                      map.setView([11.15, 121.55], 8);
                                       vehicle.setIcon(createVehicleIcon('plane'));
-
-                                      // Flug von Dumaguete nach El Nido
                                       animateMovement(dumaguete[0], dumaguete[1], elNido[0], elNido[1], 2000, 'plane', () => {
                                         document.querySelector('.info p').textContent = "2 Sekunden Stopp in El Nido!";
-
-                                        // 2 Sekunden Pause in El Nido
                                         setTimeout(() => {
                                           document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
-
-                                          // Flug von El Nido nach Caticlan
                                           animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
                                             document.querySelector('.info p').textContent = "Fähre nach Boracay!";
-
-                                            // Fahrzeug auf Fähre ändern
                                             vehicle.setIcon(createVehicleIcon('ferry'));
-
-                                            // Fähre von Caticlan nach Boracay
                                             animateMovement(caticlan[0], caticlan[1], boracay[0], boracay[1], 2000, 'ferry', () => {
                                               document.querySelector('.info p').textContent = "2 Sekunden Stopp in Boracay!";
-
-                                              // 2 Sekunden Pause in Boracay
                                               setTimeout(() => {
                                                 document.querySelector('.info p').textContent = "Fähre zurück nach Caticlan!";
-
-                                                // Fähre von Boracay nach Caticlan
                                                 animateMovement(boracay[0], boracay[1], caticlan[0], caticlan[1], 2000, 'ferry', () => {
                                                   document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Hamburg!";
-
-                                                  // Fahrzeug auf Flugzeug ändern
                                                   vehicle.setIcon(createVehicleIcon('plane'));
-						map.setView([30, 60], 2.5);
-
-                                                  // Flug von Caticlan nach Hamburg
+                                                  map.setView([30, 60], 2.5);
                                                   animateMovement(caticlan[0], caticlan[1], hamburg[0], hamburg[1], 8000, 'plane', () => {
                                                     document.querySelector('.info p').textContent = "Reise abgeschlossen!";
-                                                    document.getElementById('startButton').textContent = "Reise starten";
                                                     document.getElementById('startButton').disabled = false;
-                                                    isPaused = false;
-                                                    currentAnimation = null;
                                                   });
                                                 });
-                                              }, 2000); // 2 Sekunden Pause
+                                              }, 2000);
                                             });
                                           });
-                                        }, 2000); // 2 Sekunden Pause
+                                        }, 2000);
                                       });
                                     });
-                                  }, 2000); // 2 Sekunden Pause
+                                  }, 2000);
                                 });
                               });
                             });
-                          }, 2000); // 2 Sekunden Pause
+                          }, 2000);
                         });
-                      }, 2000); // 2 Sekunden Pause
+                      }, 2000);
                     });
-                  }, 2000); // 2 Sekunden Pause
+                  }, 2000);
                 });
-              }, 2000); // 2 Sekunden Pause
+              }, 2000);
             });
-          }, 2000); // 2 Sekunden Pause
+          }, 2000);
         });
-      }, 1000); // 1 Sekunde Pause
+      }, 1000);
     }
   </script>
 </body>
