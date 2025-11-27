@@ -54,7 +54,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey</h3>
+    <h3>Das Journey 01</h3>
     <p>Bereit für den Start!</p>
     <button id="startButton">Reise starten</button>
   </div>
@@ -129,7 +129,7 @@
     }
 
     // Funktion zum Animieren der Bewegung zwischen zwei Punkten
-    function animateMovement(startLat, startLng, endLat, endLng, duration, vehicleType, callback) {
+    function animateMovement(startLat, startLng, endLat, endLng, duration, vehicleType, followVehicle, callback) {
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
       const vehicleElement = vehicle.getElement().querySelector('.vehicle-icon');
       vehicleElement.style.transform = `rotate(${bearing}deg)`;
@@ -143,6 +143,10 @@
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
+
+        if (followVehicle) {
+          map.setView([newLat, newLng], 5);
+        }
 
         if (progress < 1) {
           animationId = requestAnimationFrame(animate);
@@ -166,7 +170,7 @@
         document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ho-Chi-Minh!";
 
         // Flug von Hamburg nach Ho-Chi-Minh
-        animateMovement(hamburg[0], hamburg[1], hoChiMinh[0], hoChiMinh[1], 3000, 'plane', () => {
+        animateMovement(hamburg[0], hamburg[1], hoChiMinh[0], hoChiMinh[1], 3000, 'plane', false, () => {
           document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ho-Chi-Minh!";
           map.setView(hoChiMinh, 6);
 
@@ -175,27 +179,27 @@
             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Da Nang!";
 
             // Flug von Ho-Chi-Minh nach Da Nang
-            animateMovement(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, 'plane', () => {
+            animateMovement(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, 'plane', false, () => {
               document.querySelector('.info p').textContent = "2 Sekunden Stopp in Da Nang!";
               map.setView(daNang, 7); // Weiter reinzoomen auf 7
 
               // 2 Sekunden Pause in Da Nang
               setTimeout(() => {
-                document.querySelector('.info p').textContent = "Busfahrt nach Sa Pa!";
+                document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ha Noi!";
 
-                // Fahrzeug auf Bus ändern
-                vehicle.setIcon(createVehicleIcon('bus'));
-
-                // Busfahrt von Da Nang nach Ha Noi
-                animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
+                // Flug von Da Nang nach Ha Noi (Karte folgt dem Flugzeug)
+                animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 3000, 'plane', true, () => {
                   document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
 
                   // 2 Sekunden Pause in Ha Noi
                   setTimeout(() => {
                     document.querySelector('.info p').textContent = "Busfahrt nach Sa Pa!";
 
+                    // Fahrzeug auf Bus ändern
+                    vehicle.setIcon(createVehicleIcon('bus'));
+
                     // Busfahrt von Ha Noi nach Sa Pa
-                    animateMovement(haNoi[0], haNoi[1], saPa[0], saPa[1], 2000, 'bus', () => {
+                    animateMovement(haNoi[0], haNoi[1], saPa[0], saPa[1], 2000, 'bus', false, () => {
                       document.querySelector('.info p').textContent = "2 Sekunden Stopp in Sa Pa!";
 
                       // 2 Sekunden Pause in Sa Pa
@@ -203,18 +207,18 @@
                         document.querySelector('.info p').textContent = "Busfahrt zurück nach Ha Noi!";
 
                         // Busfahrt von Sa Pa nach Ha Noi
-                        animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
+                        animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', false, () => {
                           document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
 
                           // Fahrzeug auf Flugzeug ändern
                           vehicle.setIcon(createVehicleIcon('plane'));
 
                           // Flug von Ha Noi nach Manila (ohne Halt)
-                          animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
+                          animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', false, () => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
 
                             // Flug von Manila nach Dumaguete
-                            animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
+                            animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', false, () => {
                               document.querySelector('.info p').textContent = "Reise abgeschlossen in Dumaguete!";
                               map.setView(dumaguete, 6);
                               document.getElementById('startButton').textContent = "Reise starten";
