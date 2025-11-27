@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      overflow: hidden; /* Verhindert Scrollbars */
+      overflow: hidden;
     }
     #map {
       height: 100vh;
@@ -48,12 +48,16 @@
     .leaflet-control-attribution {
       display: none !important;
     }
+    /* Entfernt Leaflet-Zoom-Control */
+    .leaflet-control-zoom {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>Das Journey</h3>
+    <h3>Das Journey 01</h3>
     <p>Flugzeug bereit für den Start!</p>
     <button id="startButton">Flug starten</button>
   </div>
@@ -63,8 +67,8 @@
   <script>
     // Karte initialisieren (globale Ansicht)
     const map = L.map('map', {
-      zoomControl: false, // Deaktiviert Zoom-Control, falls gewünscht
-      attributionControl: false // Deaktiviert Attribution-Control
+      zoomControl: false,
+      attributionControl: false
     }).setView([30, 60], 2);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -121,6 +125,7 @@
     // Funktion zum Starten der Animation
     function startAnimation() {
       document.querySelector('.info p').textContent = "Flugzeug unterwegs!";
+      document.getElementById('startButton').textContent = "Flug läuft...";
       document.getElementById('startButton').disabled = true;
 
       const startLat = reiseData.koordinaten[0][0];
@@ -133,7 +138,7 @@
       const planeElement = plane.getElement().querySelector('.plane-icon');
       planeElement.style.transform = `rotate(${bearing}deg)`;
 
-      // Animation mit langsamen, flüssigen Zooms
+      // Animation mit den drei gewünschten Phasen
       const totalDuration = 10000; // 10 Sekunden Gesamtzeit
       const startTime = performance.now();
 
@@ -146,21 +151,17 @@
         const newLng = startLng + (endLng - startLng) * progress;
         plane.setLatLng([newLat, newLng]);
 
-        // Phase 1: 0-10% der Animation (kurze globale Weltkarte)
-        if (progress < 0.1) {
+        // Phase 1: 0-20% der Animation (Weltkarte)
+        if (progress < 0.2) {
           map.setView([30, 60], 2);
         }
-        // Phase 2: 10-90% der Animation (langsamer Zoom auf Europa/Asien)
-        else if (progress >= 0.1 && progress < 0.9) {
-          const zoomProgress = (progress - 0.1) / 0.8; // Normalisierung auf 0-1 für diese Phase
-          const zoomLevel = 2 + (zoomProgress * 2); // Langsamer Zoom von 2 auf 4
-          map.setView([newLat, newLng], zoomLevel, { animate: true });
+        // Phase 2: 20-80% der Animation (Zoom auf Europa/Asien)
+        else if (progress >= 0.2 && progress < 0.8) {
+          map.setView([45, 70], 3);
         }
-        // Phase 3: 90-100% der Animation (langsamer Zoom auf Vietnam)
+        // Phase 3: 80-100% der Animation (Zoom auf Vietnam)
         else {
-          const zoomProgress = (progress - 0.9) / 0.1; // Normalisierung auf 0-1 für diese Phase
-          const zoomLevel = 4 + (zoomProgress * 2); // Langsamer Zoom von 4 auf 6
-          map.setView([10.8231, 106.6297], zoomLevel, { animate: true });
+          map.setView([10.8231, 106.6297], 6);
         }
 
         if (progress < 1) {
@@ -168,6 +169,7 @@
         } else {
           cancelAnimationFrame(animationId);
           document.querySelector('.info p').textContent = "Flug abgeschlossen!";
+          document.getElementById('startButton').textContent = "Flug starten";
           document.getElementById('startButton').disabled = false;
         }
       }
