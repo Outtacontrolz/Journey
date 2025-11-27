@@ -336,6 +336,7 @@
 
                                                   // Fahrzeug auf Flugzeug ändern
                                                   vehicle.setIcon(createVehicleIcon('plane'));
+						map.setView([30, 60], 2.5);
 
                                                   // Flug von Caticlan nach Hamburg
                                                   animateMovement(caticlan[0], caticlan[1], hamburg[0], hamburg[1], 8000, 'plane', () => {
