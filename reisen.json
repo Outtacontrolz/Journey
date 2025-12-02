@@ -1,20 +1,37 @@
 {
   "reisen": [
+    // **Hinflug: Hamburg → Doha → Ho-Chi-Minh**
     {
       "start": {
         "name": "Hamburg",
         "koordinaten": [53.5511, 9.9937]
       },
       "ziel": {
+        "name": "Doha",
+        "koordinaten": [25.2854, 51.5310]
+      },
+      "fahrzeug": "plane",
+      "dauer": 4000,
+      "stoppDauer": 0,
+      "zoom": [25.2854, 51.5310, 5],
+      "infoText": "Flugzeug unterwegs nach Doha (Zwischenstopp)!"
+    },
+    {
+      "start": {
+        "name": "Doha",
+        "koordinaten": [25.2854, 51.5310]
+      },
+      "ziel": {
         "name": "Ho-Chi-Minh",
         "koordinaten": [10.8231, 106.6297]
       },
       "fahrzeug": "plane",
-      "dauer": 3000,
+      "dauer": 4000,
       "stoppDauer": 2000,
       "zoom": [30, 60, 2.5],
       "infoText": "Flugzeug unterwegs nach Ho-Chi-Minh!"
     },
+    // **Rest der Reise (unverändert)**
     {
       "start": {
         "name": "Ho-Chi-Minh",
@@ -207,6 +224,7 @@
       "stoppDauer": 2000,
       "infoText": "Fähre zurück nach Caticlan!"
     },
+    // **Rückflug: Caticlan → Doha → Hamburg**
     {
       "start": {
         "name": "Caticlan",
