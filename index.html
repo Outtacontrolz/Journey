@@ -41,7 +41,7 @@
     #startButton:hover { background: #45a049; }
     #startButton:disabled { background: #cccccc; }
     .vehicle-icon {
-      font-size: 36px; /* Hier auch die Schriftgröße erhöht */
+      font-size: 36px;
       display: inline-block;
       transform-origin: center;
     }
@@ -56,11 +56,9 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       font-family: Arial, sans-serif;
     }
-    /* Entfernt Leaflet-Attribution-Balken */
     .leaflet-control-attribution {
       display: none !important;
     }
-    /* Stil für die Tooltips der Marker */
     .leaflet-tooltip {
       background-color: #3388ff;
       color: white;
@@ -84,116 +82,99 @@
     <button id="startButton">Reise starten</button>
   </div>
   <div id="coordinates">Lat: -, Lng: -, Zoom: -</div>
-  <!-- Leaflet-Bibliothek -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Karte initialisieren (globale Ansicht)
-    const map = L.map('map', {
-      attributionControl: false
-    }).setView([30, 60], 2.5);
+    // Karte initialisieren
+    const map = L.map('map', { attributionControl: false }).setView([30, 60], 2.5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
-    // Aktuelle Koordinaten und Zoom-Level anzeigen
+
+    // Aktuelle Koordinaten anzeigen
     map.on('moveend', function() {
       const center = map.getCenter();
       const zoom = map.getZoom();
-      document.getElementById('coordinates').textContent = `Lat: ${center.lat.toFixed(4)}, Lng: ${center.lng.toFixed(4)}, Zoom: ${zoom}`;
+      document.getElementById('coordinates').textContent =
+        `Lat: ${center.lat.toFixed(4)}, Lng: ${center.lng.toFixed(4)}, Zoom: ${zoom}`;
     });
-    // Variablen für Fahrzeug und Animation
-    let vehicle;
-    let animationId;
-    let reiseData;
-    // Koordinaten der Stopps
-    const hamburg = [53.5511, 9.9937];
-    const hoChiMinh = [10.8231, 106.6297];
-    const daNang = [16.0471, 108.2062];
-    const haNoi = [21.0285, 105.8542];
-    const saPa = [22.3333, 103.85];
-    const manila = [14.5995, 120.9842];
-    const dumaguete = [9.3074, 123.3054];
-    const cebu = [10.3157, 123.8854];
-    const siquijor = [9.2167, 123.5833];
-    const elNido = [11.1956, 119.4936];
-    const caticlan = [11.93, 121.95];
-    const boracay = [11.9410, 121.9386];
-    // Marker für Stopps (ohne Tooltips)
-    const markers = {
-      hamburg: L.marker(hamburg).addTo(map),
-      hoChiMinh: L.marker(hoChiMinh).addTo(map),
-      daNang: L.marker(daNang).addTo(map),
-      haNoi: L.marker(haNoi).addTo(map),
-      saPa: L.marker(saPa).addTo(map),
-      manila: L.marker(manila).addTo(map),
-      dumaguete: L.marker(dumaguete).addTo(map),
-      cebu: L.marker(cebu).addTo(map),
-      siquijor: L.marker(siquijor).addTo(map),
-      elNido: L.marker(elNido).addTo(map),
-      caticlan: L.marker(caticlan).addTo(map),
-      boracay: L.marker(boracay).addTo(map)
-    };
-    // Fahrzeug-Icon (Flugzeug, Bus oder Fähre)
+
+    // Fahrzeug-Icon erstellen
     function createVehicleIcon(vehicleType) {
-      let icon;
-      if (vehicleType === 'plane') {
-        icon = '✈️';
-      } else if (vehicleType === 'bus') {
-        icon = '🚌';
-      } else if (vehicleType === 'ferry') {
-        icon = '⛴️';
-      }
+      const icons = { plane: '✈️', bus: '🚌', ferry: '⛴️' };
       return L.divIcon({
-        html: `<div class="vehicle-icon">${icon}</div>`,
-        iconSize: [60, 60], // Größe auf [60, 60] erhöht
+        html: `<div class="vehicle-icon">${icons[vehicleType]}</div>`,
+        iconSize: [60, 60],
         className: 'vehicle-marker'
       });
     }
-    // Fahrzeug am Startpunkt platzieren
-    vehicle = L.marker(hamburg, { icon: createVehicleIcon('plane') }).addTo(map);
-    // Funktion, um Tooltips in der Nähe des Fahrzeugs anzuzeigen
-    function showNearbyCityNames(lat, lng) {
-      Object.entries(markers).forEach(([city, marker]) => {
-        const distance = Math.sqrt(Math.pow(lat - marker.getLatLng().lat, 2) + Math.pow(lng - marker.getLatLng().lng, 2));
-        if (distance < 5) { // Radius von 5°
-          if (!marker.getTooltip()) {
-            marker.bindTooltip(city.replace(/([A-Z])/g, ' $1').trim(), { permanent: true, direction: 'top' }).openTooltip();
-          }
-        } else {
-          if (marker.getTooltip()) {
-            marker.unbindTooltip();
-          }
-        }
-      });
-    }
-    // Flugdaten laden
+
+    // Fahrzeug und Marker
+    let vehicle;
+    let markers = {};
+
+    // JSON-Daten laden und Animation starten
     fetch('reisen.json')
       .then(response => response.json())
       .then(data => {
-        reiseData = data.reisen[0];
-        document.querySelector('.info p').textContent = "Bereit für den Start!";
-        document.getElementById('startButton').addEventListener('click', toggleAnimation);
-      })
-      .catch(error => {
-        console.error("Fehler:", error);
-        document.querySelector('.info p').textContent = "Fehler beim Laden der Daten!";
+        const reisen = data.reisen;
+
+        // Marker für alle Ziele setzen
+        reisen.forEach((reise, index) => {
+          markers[reise.ziel.name] = L.marker(reise.ziel.koordinaten).addTo(map);
+          markers[reise.start.name] = L.marker(reise.start.koordinaten).addTo(map);
+        });
+
+        // Fahrzeug am Startpunkt platzieren
+        vehicle = L.marker(reisen[0].start.koordinaten, {
+          icon: createVehicleIcon(reisen[0].fahrzeug)
+        }).addTo(map);
+
+        // Animation starten
+        document.getElementById('startButton').addEventListener('click', () => {
+          startAnimation(reisen, 0);
+        });
       });
-    // Funktion zur Berechnung des Winkels zwischen zwei Koordinaten (in Grad)
-    function calculateBearing(lat1, lng1, lat2, lng2) {
-      const dLng = lng2 - lng1;
-      const y = Math.sin(dLng) * Math.cos(lat2);
-      const x = Math.cos(lat1) * Math.sin(lat2) -
-                Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
-      let bearing = Math.atan2(y, x) * 180 / Math.PI;
-      bearing = (bearing + 360) % 360; // Normalisierung auf 0-360°
-      return bearing;
+
+    // Animation der Reise
+    function startAnimation(reisen, currentStep) {
+      if (currentStep >= reisen.length) {
+        document.querySelector('.info p').textContent = "Reise abgeschlossen!";
+        document.getElementById('startButton').disabled = false;
+        return;
+      }
+
+      const reise = reisen[currentStep];
+      document.querySelector('.info p').textContent = reise.infoText;
+      document.getElementById('startButton').disabled = true;
+
+      // Karte zoomen (falls definiert)
+      if (reise.zoom) {
+        map.setView([reise.zoom[0], reise.zoom[1]], reise.zoom[2]);
+      }
+
+      // Fahrzeug-Icon aktualisieren
+      vehicle.setIcon(createVehicleIcon(reise.fahrzeug));
+
+      // Animation starten
+      animateMovement(
+        reise.start.koordinaten[0], reise.start.koordinaten[1],
+        reise.ziel.koordinaten[0], reise.ziel.koordinaten[1],
+        reise.dauer,
+        reise.fahrzeug,
+        () => {
+          setTimeout(() => startAnimation(reisen, currentStep + 1), 2000);
+        }
+      );
     }
-    // Funktion zum Animieren der Bewegung zwischen zwei Punkten
+
+    // Bewegung animieren
     function animateMovement(startLat, startLng, endLat, endLng, duration, vehicleType, callback) {
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
       const vehicleElement = vehicle.getElement().querySelector('.vehicle-icon');
       if (vehicleElement) {
         vehicleElement.style.transform = `rotate(${bearing}deg)`;
       }
+
       const startTime = performance.now();
       function animate(currentTime) {
         const elapsed = currentTime - startTime;
@@ -201,119 +182,22 @@
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
-        showNearbyCityNames(newLat, newLng); // Zeige Stadtnamen in der Nähe
         if (progress < 1) {
-          animationId = requestAnimationFrame(animate);
+          requestAnimationFrame(animate);
         } else {
-          cancelAnimationFrame(animationId);
           if (callback) callback();
         }
       }
-      animationId = requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     }
-    // Funktion zum Starten der Animation
-    function toggleAnimation() {
-      const button = document.getElementById('startButton');
-      button.disabled = true;
-      startAnimation();
-    }
-    // Funktion zum Starten der Animation
-    function startAnimation() {
-      document.querySelector('.info p').textContent = "Reise startet in 1 Sekunde!";
-      setTimeout(() => {
-        document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ho-Chi-Minh!";
-        map.setView([30, 60], 2.5);
-        animateMovement(hamburg[0], hamburg[1], hoChiMinh[0], hoChiMinh[1], 3000, 'plane', () => {
-          document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ho-Chi-Minh!";
-          map.setView([13, 108], 5);
-          setTimeout(() => {
-            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Da Nang!";
-            map.setView([16.5, 107.5], 6);
-            animateMovement(hoChiMinh[0], hoChiMinh[1], daNang[0], daNang[1], 2000, 'plane', () => {
-              document.querySelector('.info p').textContent = "2 Sekunden Stopp in Da Nang!";
-              setTimeout(() => {
-                document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Ha Noi!";
-                map.setView([16.5, 107.5], 6);
-                animateMovement(daNang[0], daNang[1], haNoi[0], haNoi[1], 2000, 'plane', () => {
-                  document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
-                  map.setView([21.5, 104.5], 7);
-                  setTimeout(() => {
-                    document.querySelector('.info p').textContent = "Busfahrt nach Sa Pa!";
-                    vehicle.setIcon(createVehicleIcon('bus'));
-                    animateMovement(haNoi[0], haNoi[1], saPa[0], saPa[1], 2000, 'bus', () => {
-                      document.querySelector('.info p').textContent = "2 Sekunden Stopp in Sa Pa!";
-                      setTimeout(() => {
-                        document.querySelector('.info p').textContent = "Busfahrt zurück nach Ha Noi!";
-                        map.setView([21.5, 104.5], 7);
-                        animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
-                          document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
-                          setTimeout(() => {
-                            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
-                            map.setView([16.14, 114.76], 6);
-                            vehicle.setIcon(createVehicleIcon('plane'));
-                            animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
-                              document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
-                              map.setView([12.86, 122.31], 7);
-                              animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
-                                // 2-Sekunden-Stopp in Dumaguete
-                                document.querySelector('.info p').textContent = "2 Sekunden Stopp in Dumaguete!";
-                                setTimeout(() => {
-                                  document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
-                                  map.setView([9.28, 123.41], 10);
-                                  vehicle.setIcon(createVehicleIcon('ferry'));
-                                  animateMovement(dumaguete[0], dumaguete[1], siquijor[0], siquijor[1], 2000, 'ferry', () => {
-                                    document.querySelector('.info p').textContent = "2 Sekunden Stopp in Siquijor!";
-                                    setTimeout(() => {
-                                      document.querySelector('.info p').textContent = "Fähre zurück nach Dumaguete!";
-                                      animateMovement(siquijor[0], siquijor[1], dumaguete[0], dumaguete[1], 2000, 'ferry', () => {
-                                        document.querySelector('.info p').textContent = "Flugzeug unterwegs nach El Nido (über Cebu)!";
-                                        map.setView([12.86, 122.31], 7);
-                                        vehicle.setIcon(createVehicleIcon('plane'));
-                                        animateMovement(dumaguete[0], dumaguete[1], cebu[0], cebu[1], 1000, 'plane', () => {
-                                          animateMovement(cebu[0], cebu[1], elNido[0], elNido[1], 1500, 'plane', () => {
-                                            document.querySelector('.info p').textContent = "2 Sekunden Stopp in El Nido!";
-                                            setTimeout(() => {
-                                              document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
-                                              animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
-                                                document.querySelector('.info p').textContent = "Fähre nach Boracay!";
-                                                map.setView([11.9206, 121.9375], 14);
-                                                vehicle.setIcon(createVehicleIcon('ferry'));
-                                                animateMovement(caticlan[0], caticlan[1], boracay[0], boracay[1], 2000, 'ferry', () => {
-                                                  document.querySelector('.info p').textContent = "2 Sekunden Stopp in Boracay!";
-                                                  setTimeout(() => {
-                                                    document.querySelector('.info p').textContent = "Fähre zurück nach Caticlan!";
-                                                    animateMovement(boracay[0], boracay[1], caticlan[0], caticlan[1], 2000, 'ferry', () => {
-                                                      document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Hamburg!";
-                                                      vehicle.setIcon(createVehicleIcon('plane'));
-                                                      map.setView([30, 60], 2.5);
-                                                      animateMovement(caticlan[0], caticlan[1], hamburg[0], hamburg[1], 8000, 'plane', () => {
-                                                        document.querySelector('.info p').textContent = "Reise abgeschlossen!";
-                                                        document.getElementById('startButton').disabled = false;
-                                                      });
-                                                    });
-                                                  }, 2000);
-                                                });
-                                              });
-                                            }, 2000);
-                                          });
-                                        });
-                                      });
-                                    }, 2000);
-                                  });
-                                }, 2000); // 2-Sekunden-Stopp in Dumaguete
-                              });
-                            });
-                          }, 2000);
-                        });
-                      }, 2000);
-                    });
-                  }, 2000);
-                });
-              }, 2000);
-            });
-          }, 2000);
-        });
-      }, 1000);
+
+    // Winkel für die Fahrzeugausrichtung berechnen
+    function calculateBearing(lat1, lng1, lat2, lng2) {
+      const dLng = lng2 - lng1;
+      const y = Math.sin(dLng) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+      let bearing = Math.atan2(y, x) * 180 / Math.PI;
+      return (bearing + 360) % 360;
     }
   </script>
 </body>

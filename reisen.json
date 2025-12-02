@@ -1,11 +1,211 @@
 {
   "reisen": [
     {
-      "start": "Hamburg",
-      "ziel": "Ho-Chi-Minh",
-      "koordinaten": [[53.5511, 9.9937], [10.8231, 106.6297]],
-      "datum": "2025-12-01",
-      "beschreibung": "Unser erster Flug nach Vietnam!"
+      "start": {
+        "name": "Hamburg",
+        "koordinaten": [53.5511, 9.9937],
+        "beschreibung": "Start unserer Reise!"
+      },
+      "ziel": {
+        "name": "Ho-Chi-Minh",
+        "koordinaten": [10.8231, 106.6297],
+        "beschreibung": "Ankunft in Vietnam!"
+      },
+      "fahrzeug": "plane",
+      "dauer": 3000,
+      "zoom": [30, 60, 2.5],
+      "infoText": "Flugzeug unterwegs nach Ho-Chi-Minh!"
+    },
+    {
+      "start": {
+        "name": "Ho-Chi-Minh",
+        "koordinaten": [10.8231, 106.6297]
+      },
+      "ziel": {
+        "name": "Da Nang",
+        "koordinaten": [16.0471, 108.2062]
+      },
+      "fahrzeug": "plane",
+      "dauer": 2000,
+      "zoom": [13, 108, 5],
+      "infoText": "Flugzeug unterwegs nach Da Nang!"
+    },
+    {
+      "start": {
+        "name": "Da Nang",
+        "koordinaten": [16.0471, 108.2062]
+      },
+      "ziel": {
+        "name": "Ha Noi",
+        "koordinaten": [21.0285, 105.8542]
+      },
+      "fahrzeug": "plane",
+      "dauer": 2000,
+      "zoom": [16.5, 107.5, 6],
+      "infoText": "Flugzeug unterwegs nach Ha Noi!"
+    },
+    {
+      "start": {
+        "name": "Ha Noi",
+        "koordinaten": [21.0285, 105.8542]
+      },
+      "ziel": {
+        "name": "Sa Pa",
+        "koordinaten": [22.3333, 103.85]
+      },
+      "fahrzeug": "bus",
+      "dauer": 2000,
+      "zoom": [21.5, 104.5, 7],
+      "infoText": "Busfahrt nach Sa Pa!"
+    },
+    {
+      "start": {
+        "name": "Sa Pa",
+        "koordinaten": [22.3333, 103.85]
+      },
+      "ziel": {
+        "name": "Ha Noi",
+        "koordinaten": [21.0285, 105.8542]
+      },
+      "fahrzeug": "bus",
+      "dauer": 2000,
+      "zoom": [21.5, 104.5, 7],
+      "infoText": "Busfahrt zurück nach Ha Noi!"
+    },
+    {
+      "start": {
+        "name": "Ha Noi",
+        "koordinaten": [21.0285, 105.8542]
+      },
+      "ziel": {
+        "name": "Manila",
+        "koordinaten": [14.5995, 120.9842]
+      },
+      "fahrzeug": "plane",
+      "dauer": 3000,
+      "zoom": [16.14, 114.76, 6],
+      "infoText": "Flugzeug unterwegs nach Manila!"
+    },
+    {
+      "start": {
+        "name": "Manila",
+        "koordinaten": [14.5995, 120.9842]
+      },
+      "ziel": {
+        "name": "Dumaguete",
+        "koordinaten": [9.3074, 123.3054]
+      },
+      "fahrzeug": "plane",
+      "dauer": 3000,
+      "zoom": [12.86, 122.31, 7],
+      "infoText": "Flugzeug unterwegs nach Dumaguete!"
+    },
+    {
+      "start": {
+        "name": "Dumaguete",
+        "koordinaten": [9.3074, 123.3054]
+      },
+      "ziel": {
+        "name": "Siquijor",
+        "koordinaten": [9.2167, 123.5833]
+      },
+      "fahrzeug": "ferry",
+      "dauer": 2000,
+      "zoom": [9.28, 123.41, 10],
+      "infoText": "Fähre nach Siquijor!"
+    },
+    {
+      "start": {
+        "name": "Siquijor",
+        "koordinaten": [9.2167, 123.5833]
+      },
+      "ziel": {
+        "name": "Dumaguete",
+        "koordinaten": [9.3074, 123.3054]
+      },
+      "fahrzeug": "ferry",
+      "dauer": 2000,
+      "infoText": "Fähre zurück nach Dumaguete!"
+    },
+    {
+      "start": {
+        "name": "Dumaguete",
+        "koordinaten": [9.3074, 123.3054]
+      },
+      "ziel": {
+        "name": "Cebu",
+        "koordinaten": [10.3157, 123.8854]
+      },
+      "fahrzeug": "plane",
+      "dauer": 1000,
+      "infoText": "Flug von Dumaguete nach Cebu!"
+    },
+    {
+      "start": {
+        "name": "Cebu",
+        "koordinaten": [10.3157, 123.8854]
+      },
+      "ziel": {
+        "name": "El Nido",
+        "koordinaten": [11.1956, 119.4936]
+      },
+      "fahrzeug": "plane",
+      "dauer": 1500,
+      "infoText": "Flug von Cebu nach El Nido!"
+    },
+    {
+      "start": {
+        "name": "El Nido",
+        "koordinaten": [11.1956, 119.4936]
+      },
+      "ziel": {
+        "name": "Caticlan",
+        "koordinaten": [11.93, 121.95]
+      },
+      "fahrzeug": "plane",
+      "dauer": 2000,
+      "infoText": "Flugzeug unterwegs nach Caticlan!"
+    },
+    {
+      "start": {
+        "name": "Caticlan",
+        "koordinaten": [11.93, 121.95]
+      },
+      "ziel": {
+        "name": "Boracay",
+        "koordinaten": [11.9410, 121.9386]
+      },
+      "fahrzeug": "ferry",
+      "dauer": 2000,
+      "zoom": [11.9206, 121.9375, 14],
+      "infoText": "Fähre nach Boracay!"
+    },
+    {
+      "start": {
+        "name": "Boracay",
+        "koordinaten": [11.9410, 121.9386]
+      },
+      "ziel": {
+        "name": "Caticlan",
+        "koordinaten": [11.93, 121.95]
+      },
+      "fahrzeug": "ferry",
+      "dauer": 2000,
+      "infoText": "Fähre zurück nach Caticlan!"
+    },
+    {
+      "start": {
+        "name": "Caticlan",
+        "koordinaten": [11.93, 121.95]
+      },
+      "ziel": {
+        "name": "Hamburg",
+        "koordinaten": [53.5511, 9.9937]
+      },
+      "fahrzeug": "plane",
+      "dauer": 8000,
+      "zoom": [30, 60, 2.5],
+      "infoText": "Flugzeug unterwegs nach Hamburg!"
     }
   ]
 }
