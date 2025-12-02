@@ -138,6 +138,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 1000,
+      "zoom": [12.86, 122.31, 7],
       "infoText": "Flug von Dumaguete nach Cebu!"
     },
     {
