@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -89,7 +90,6 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
-
     // Aktuelle Koordinaten anzeigen
     map.on('moveend', function() {
       const center = map.getCenter();
@@ -97,7 +97,6 @@
       document.getElementById('coordinates').textContent =
         `Lat: ${center.lat.toFixed(4)}, Lng: ${center.lng.toFixed(4)}, Zoom: ${zoom}`;
     });
-
     // Fahrzeug-Icon erstellen
     function createVehicleIcon(vehicleType) {
       const icons = { plane: '✈️', bus: '🚌', ferry: '⛴️' };
@@ -107,11 +106,9 @@
         className: 'vehicle-marker'
       });
     }
-
     // Fahrzeug und Marker
     let vehicle;
     let markers = {};
-
     // Funktion, um Stadtnamen in der Nähe des Fahrzeugs anzuzeigen
     function showNearbyCityNames(lat, lng) {
       Object.entries(markers).forEach(([city, marker]) => {
@@ -131,13 +128,11 @@
         }
       });
     }
-
     // JSON-Daten laden und Animation starten
     fetch('https://raw.githubusercontent.com/outtacontrolz/Journey/main/reisen.json')
       .then(response => response.json())
       .then(data => {
         const reisen = data.reisen;
-
         // Marker für alle Ziele setzen
         reisen.forEach((reise) => {
           if (!markers[reise.start.name]) {
@@ -147,12 +142,10 @@
             markers[reise.ziel.name] = L.marker(reise.ziel.koordinaten).addTo(map);
           }
         });
-
         // Fahrzeug am Startpunkt platzieren
         vehicle = L.marker(reisen[0].start.koordinaten, {
           icon: createVehicleIcon(reisen[0].fahrzeug)
         }).addTo(map);
-
         // Animation starten
         document.getElementById('startButton').addEventListener('click', () => {
           startAnimation(reisen, 0);
@@ -162,7 +155,6 @@
         console.error("Fehler beim Laden der Daten:", error);
         document.querySelector('.info p').textContent = "Fehler beim Laden der Daten!";
       });
-
     // Animation der Reise
     function startAnimation(reisen, currentStep) {
       if (currentStep >= reisen.length) {
@@ -170,19 +162,19 @@
         document.getElementById('startButton').disabled = false;
         return;
       }
-
       const reise = reisen[currentStep];
       document.querySelector('.info p').textContent = reise.infoText;
       document.getElementById('startButton').disabled = true;
-
-      // Karte zoomen (falls in der JSON definiert)
-      if (reise.zoom) {
-        map.setView([reise.zoom[0], reise.zoom[1]], reise.zoom[2]);
-      }
-
       // Fahrzeug-Icon aktualisieren
       vehicle.setIcon(createVehicleIcon(reise.fahrzeug));
-
+      // Zoom während der Stoppdauer auslösen
+      if (reise.zoom) {
+        setTimeout(() => {
+          map.flyTo([reise.zoom[0], reise.zoom[1]], reise.zoom[2], {
+            duration: reise.stoppDauer / 1000 // Dauer des Zooms = Stoppdauer (in Sekunden)
+          });
+        }, 0);
+      }
       // Animation starten
       animateMovement(
         reise.start.koordinaten[0], reise.start.koordinaten[1],
@@ -196,7 +188,6 @@
         }
       );
     }
-
     // Bewegung animieren
     function animateMovement(startLat, startLng, endLat, endLng, duration, vehicleType, callback) {
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
@@ -204,7 +195,6 @@
       if (vehicleElement) {
         vehicleElement.style.transform = `rotate(${bearing}deg)`;
       }
-
       const startTime = performance.now();
       function animate(currentTime) {
         const elapsed = currentTime - startTime;
@@ -212,10 +202,8 @@
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
-
         // Stadtnamen in der Nähe anzeigen
         showNearbyCityNames(newLat, newLng);
-
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
@@ -224,7 +212,6 @@
       }
       requestAnimationFrame(animate);
     }
-
     // Winkel für die Fahrzeugausrichtung berechnen
     function calculateBearing(lat1, lng1, lat2, lng2) {
       const dLng = lng2 - lng1;
