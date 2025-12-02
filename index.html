@@ -247,11 +247,15 @@
                         map.setView([21.5, 104.5], 7);
                         animateMovement(saPa[0], saPa[1], haNoi[0], haNoi[1], 2000, 'bus', () => {
                           document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
-                          setTimeout(() => {
-                            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
-                            map.setView([16.28, 115], 6);
-                            vehicle.setIcon(createVehicleIcon('plane'));
-                            animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
+                          // ...
+setTimeout(() => {
+  document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
+  // Karte auf die Philippinen zoomen, bevor es nach Manila geht
+  map.setView([12.8797, 121.7740], 6); // Zentrum der Philippinen, Zoom-Level 6
+  vehicle.setIcon(createVehicleIcon('plane'));
+  animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
+// ...
+
                               document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
                               map.setView([12, 122], 5);
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
@@ -271,8 +275,14 @@
                                         // Flug von Cebu nach El Nido (ohne Stopp)
                                         animateMovement(cebu[0], cebu[1], elNido[0], elNido[1], 1500, 'plane', () => {
                                           document.querySelector('.info p').textContent = "2 Sekunden Stopp in El Nido!";
-                                          setTimeout(() => {
-                                            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
+                                          // ...
+setTimeout(() => {
+  document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
+  // Karte auf die Region um Caticlan/Boracay zoomen
+  map.setView([11.9206, 121.9375], 10); // Caticlan, Zoom-Level 10
+  animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
+// ...
+
                                             animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
                                               document.querySelector('.info p').textContent = "Fähre nach Boracay!";
                                               vehicle.setIcon(createVehicleIcon('ferry'));
