@@ -186,12 +186,10 @@
         reise.dauer,
         reise.fahrzeug,
         () => {
-          animateMovement(
-  // ... Parameter ...
-  () => {
-    const stoppDauer = reise.stoppDauer !== undefined ? reise.stoppDauer : 2000; // Standard: 2 Sekunden
-    setTimeout(() => startAnimation(reisen, currentStep + 1), stoppDauer);
-  }
+          // Stopp-Dauer aus der JSON oder Standard (2000ms)
+          const stoppDauer = reise.stoppDauer !== undefined ? reise.stoppDauer : 2000;
+          setTimeout(() => startAnimation(reisen, currentStep + 1), stoppDauer);
+        }
       );
     }
 
