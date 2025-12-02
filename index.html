@@ -112,6 +112,26 @@
     let vehicle;
     let markers = {};
 
+    // Funktion, um Stadtnamen in der Nähe des Fahrzeugs anzuzeigen
+    function showNearbyCityNames(lat, lng) {
+      Object.entries(markers).forEach(([city, marker]) => {
+        const markerLatLng = marker.getLatLng();
+        const distance = Math.sqrt(
+          Math.pow(lat - markerLatLng.lat, 2) +
+          Math.pow(lng - markerLatLng.lng, 2)
+        );
+        if (distance < 5) { // Radius von 5°
+          if (!marker.getTooltip()) {
+            marker.bindTooltip(city, { permanent: true, direction: 'top' }).openTooltip();
+          }
+        } else {
+          if (marker.getTooltip()) {
+            marker.unbindTooltip();
+          }
+        }
+      });
+    }
+
     // JSON-Daten laden und Animation starten
     fetch('reisen.json')
       .then(response => response.json())
@@ -121,14 +141,10 @@
         // Marker für alle Ziele setzen (mit Tooltips)
         reisen.forEach((reise, index) => {
           if (!markers[reise.start.name]) {
-            markers[reise.start.name] = L.marker(reise.start.koordinaten)
-              .addTo(map)
-              .bindTooltip(reise.start.name, { permanent: false, direction: 'top' });
+            markers[reise.start.name] = L.marker(reise.start.koordinaten).addTo(map);
           }
           if (!markers[reise.ziel.name]) {
-            markers[reise.ziel.name] = L.marker(reise.ziel.koordinaten)
-              .addTo(map)
-              .bindTooltip(reise.ziel.name, { permanent: false, direction: 'top' });
+            markers[reise.ziel.name] = L.marker(reise.ziel.koordinaten).addTo(map);
           }
         });
 
@@ -190,6 +206,10 @@
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
+
+        // Stadtnamen in der Nähe anzeigen
+        showNearbyCityNames(newLat, newLng);
+
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
