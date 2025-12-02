@@ -95,19 +95,38 @@
         "name": "Dumaguete",
         "koordinaten": [9.3074, 123.3054]
       },
-   "fahrzeug": "plane",
+      "fahrzeug": "plane",
       "dauer": 3000,
       "zoom": [12.86, 122.31, 7],
       "infoText": "Flugzeug unterwegs nach Dumaguete!"
     },
-"ziel": {
+    {
+      "start": {
+        "name": "Dumaguete",
+        "koordinaten": [9.3074, 123.3054]
+      },
+      "ziel": {
         "name": "Siquijor",
-        "koordinaten": [9.28, 123.41]
-
+        "koordinaten": [9.2167, 123.5833]
+      },
       "fahrzeug": "ferry",
       "dauer": 2000,
       "zoom": [9.28, 123.41, 10],
       "infoText": "Fähre nach Siquijor!"
+    },
+    {
+      "start": {
+        "name": "Siquijor",
+        "koordinaten": [9.2167, 123.5833]
+      },
+      "ziel": {
+        "name": "Dumaguete",
+        "koordinaten": [9.3074, 123.3054]
+      },
+      "fahrzeug": "ferry",
+      "dauer": 2000,
+      "infoText": "Fähre zurück nach Dumaguete!"
+    },
     {
       "start": {
         "name": "Dumaguete",

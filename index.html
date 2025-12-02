@@ -138,7 +138,7 @@
       .then(data => {
         const reisen = data.reisen;
 
-        // Marker für alle Ziele setzen (mit Tooltips)
+        // Marker für alle Ziele setzen
         reisen.forEach((reise, index) => {
           if (!markers[reise.start.name]) {
             markers[reise.start.name] = L.marker(reise.start.koordinaten).addTo(map);
@@ -186,6 +186,7 @@
         reise.dauer,
         reise.fahrzeug,
         () => {
+          // 2-Sekunden-Stopp an jedem Ziel
           setTimeout(() => startAnimation(reisen, currentStep + 1), 2000);
         }
       );
