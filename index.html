@@ -186,9 +186,12 @@
         reise.dauer,
         reise.fahrzeug,
         () => {
-          // 2-Sekunden-Stopp an jedem Ziel
-          setTimeout(() => startAnimation(reisen, currentStep + 1), 2000);
-        }
+          animateMovement(
+  // ... Parameter ...
+  () => {
+    const stoppDauer = reise.stoppDauer !== undefined ? reise.stoppDauer : 2000; // Standard: 2 Sekunden
+    setTimeout(() => startAnimation(reisen, currentStep + 1), stoppDauer);
+  }
       );
     }
 
