@@ -3,17 +3,15 @@
     {
       "start": {
         "name": "Hamburg",
-        "koordinaten": [53.5511, 9.9937],
-        "beschreibung": "Start unserer Reise!"
+        "koordinaten": [53.5511, 9.9937]
       },
       "ziel": {
         "name": "Ho-Chi-Minh",
-        "koordinaten": [10.8231, 106.6297],
-        "beschreibung": "Ankunft in Vietnam!"
+        "koordinaten": [10.8231, 106.6297]
       },
       "fahrzeug": "plane",
       "dauer": 3000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp
+      "stoppDauer": 2000,
       "zoom": [30, 60, 2.5],
       "infoText": "Flugzeug unterwegs nach Ho-Chi-Minh!"
     },
@@ -28,7 +26,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp
+      "stoppDauer": 2000,
       "zoom": [13, 108, 5],
       "infoText": "Flugzeug unterwegs nach Da Nang!"
     },
@@ -43,7 +41,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp
+      "stoppDauer": 2000,
       "zoom": [16.5, 107.5, 6],
       "infoText": "Flugzeug unterwegs nach Ha Noi!"
     },
@@ -58,7 +56,7 @@
       },
       "fahrzeug": "bus",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp
+      "stoppDauer": 2000,
       "zoom": [21.5, 104.5, 7],
       "infoText": "Busfahrt nach Sa Pa!"
     },
@@ -73,7 +71,7 @@
       },
       "fahrzeug": "bus",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp
+      "stoppDauer": 2000,
       "zoom": [21.5, 104.5, 7],
       "infoText": "Busfahrt zurück nach Ha Noi!"
     },
@@ -88,7 +86,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 3000,
-      "stoppDauer": 5000,  // 5 Sekunden Stopp in Manila
+      "stoppDauer": 5000,
       "zoom": [16.14, 114.76, 6],
       "infoText": "Flugzeug unterwegs nach Manila!"
     },
@@ -103,7 +101,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 3000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp in Dumaguete
+      "stoppDauer": 2000,
       "zoom": [12.86, 122.31, 7],
       "infoText": "Flugzeug unterwegs nach Dumaguete!"
     },
@@ -118,7 +116,7 @@
       },
       "fahrzeug": "ferry",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp in Siquijor
+      "stoppDauer": 2000,
       "zoom": [9.28, 123.41, 10],
       "infoText": "Fähre nach Siquijor!"
     },
@@ -133,7 +131,7 @@
       },
       "fahrzeug": "ferry",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp in Dumaguete
+      "stoppDauer": 2000,
       "infoText": "Fähre zurück nach Dumaguete!"
     },
     {
@@ -147,7 +145,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 1000,
-      "stoppDauer": 0,  // 0 Sekunden Stopp in Cebu (nur "Flug über")
+      "stoppDauer": 0,
       "zoom": [12.86, 122.31, 7],
       "infoText": "Flug von Dumaguete nach Cebu (ohne Stopp)!"
     },
@@ -162,7 +160,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 1500,
-      "stoppDauer": 0,  // 0 Sekunden Stopp in Cebu (nur "Flug über")
+      "stoppDauer": 0,
       "zoom": [12.86, 122.31, 7],
       "infoText": "Flug von Cebu nach El Nido (ohne Stopp)!"
     },
@@ -177,7 +175,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp in Caticlan
+      "stoppDauer": 2000,
       "infoText": "Flugzeug unterwegs nach Caticlan!"
     },
     {
@@ -191,7 +189,7 @@
       },
       "fahrzeug": "ferry",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp in Boracay
+      "stoppDauer": 2000,
       "zoom": [11.9206, 121.9375, 14],
       "infoText": "Fähre nach Boracay!"
     },
@@ -206,7 +204,7 @@
       },
       "fahrzeug": "ferry",
       "dauer": 2000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp in Caticlan
+      "stoppDauer": 2000,
       "infoText": "Fähre zurück nach Caticlan!"
     },
     {
@@ -220,7 +218,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 8000,
-      "stoppDauer": 2000,  // 2 Sekunden Stopp in Hamburg
+      "stoppDauer": 2000,
       "zoom": [30, 60, 2.5],
       "infoText": "Flugzeug unterwegs nach Hamburg!"
     }

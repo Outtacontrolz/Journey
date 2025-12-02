@@ -139,7 +139,7 @@
         const reisen = data.reisen;
 
         // Marker für alle Ziele setzen
-        reisen.forEach((reise, index) => {
+        reisen.forEach((reise) => {
           if (!markers[reise.start.name]) {
             markers[reise.start.name] = L.marker(reise.start.koordinaten).addTo(map);
           }
@@ -157,6 +157,10 @@
         document.getElementById('startButton').addEventListener('click', () => {
           startAnimation(reisen, 0);
         });
+      })
+      .catch(error => {
+        console.error("Fehler beim Laden der Daten:", error);
+        document.querySelector('.info p').textContent = "Fehler beim Laden der Daten!";
       });
 
     // Animation der Reise
