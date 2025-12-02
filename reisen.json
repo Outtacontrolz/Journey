@@ -86,7 +86,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 3000,
-      "stoppDauer": 5000,
+      "stoppDauer": 0,
       "zoom": [16.14, 114.76, 6],
       "infoText": "Flugzeug unterwegs nach Manila!"
     },
@@ -160,7 +160,7 @@
       },
       "fahrzeug": "plane",
       "dauer": 1500,
-      "stoppDauer": 0,
+      "stoppDauer": 2000,
       "zoom": [12.86, 122.31, 7],
       "infoText": "Flug von Cebu nach El Nido (ohne Stopp)!"
     },
