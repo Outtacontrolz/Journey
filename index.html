@@ -41,7 +41,7 @@
     #startButton:hover { background: #45a049; }
     #startButton:disabled { background: #cccccc; }
     .vehicle-icon {
-      font-size: 24px;
+      font-size: 36px; /* Hier auch die Schriftgröße erhöht */
       display: inline-block;
       transform-origin: center;
     }
@@ -144,7 +144,7 @@
       }
       return L.divIcon({
         html: `<div class="vehicle-icon">${icon}</div>`,
-        iconSize: [40, 40],
+        iconSize: [60, 60], // Größe auf [60, 60] erhöht
         className: 'vehicle-marker'
       });
     }
@@ -249,58 +249,58 @@
                           document.querySelector('.info p').textContent = "2 Sekunden Stopp in Ha Noi!";
                           setTimeout(() => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
-                            // Karte auf die Philippinen zoomen, bevor es nach Manila geht
                             map.setView([16.14, 114.76], 6);
                             vehicle.setIcon(createVehicleIcon('plane'));
                             animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
                               document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
                               map.setView([12.86, 122.31], 7);
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
-                                document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
-                                map.setView([9.28, 123.41], 10);
-                                vehicle.setIcon(createVehicleIcon('ferry'));
-                                animateMovement(dumaguete[0], dumaguete[1], siquijor[0], siquijor[1], 2000, 'ferry', () => {
-                                  document.querySelector('.info p').textContent = "2 Sekunden Stopp in Siquijor!";
-                                  setTimeout(() => {
-                                    document.querySelector('.info p').textContent = "Fähre zurück nach Dumaguete!";
-                                    animateMovement(siquijor[0], siquijor[1], dumaguete[0], dumaguete[1], 2000, 'ferry', () => {
-                                      document.querySelector('.info p').textContent = "Flugzeug unterwegs nach El Nido (über Cebu)!";
-                                      map.setView([12.86, 122.31], 7);
-                                      vehicle.setIcon(createVehicleIcon('plane'));
-                                      // Flug von Dumaguete nach Cebu (ohne Stopp)
-                                      animateMovement(dumaguete[0], dumaguete[1], cebu[0], cebu[1], 1000, 'plane', () => {
-                                        // Flug von Cebu nach El Nido (ohne Stopp)
-                                        animateMovement(cebu[0], cebu[1], elNido[0], elNido[1], 1500, 'plane', () => {
-                                          document.querySelector('.info p').textContent = "2 Sekunden Stopp in El Nido!";
-                                          setTimeout(() => {
-                                            document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
-                                            animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
-                                              document.querySelector('.info p').textContent = "Fähre nach Boracay!";
-                                              // Karte auf die Region um Caticlan/Boracay zoomen
-                                              map.setView([11.9206, 121.9375], 14);
-                                              vehicle.setIcon(createVehicleIcon('ferry'));
-                                              animateMovement(caticlan[0], caticlan[1], boracay[0], boracay[1], 2000, 'ferry', () => {
-                                                document.querySelector('.info p').textContent = "2 Sekunden Stopp in Boracay!";
-                                                setTimeout(() => {
-                                                  document.querySelector('.info p').textContent = "Fähre zurück nach Caticlan!";
-                                                  animateMovement(boracay[0], boracay[1], caticlan[0], caticlan[1], 2000, 'ferry', () => {
-                                                    document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Hamburg!";
-                                                    vehicle.setIcon(createVehicleIcon('plane'));
-                                                    map.setView([30, 60], 2.5);
-                                                    animateMovement(caticlan[0], caticlan[1], hamburg[0], hamburg[1], 8000, 'plane', () => {
-                                                      document.querySelector('.info p').textContent = "Reise abgeschlossen!";
-                                                      document.getElementById('startButton').disabled = false;
+                                // 2-Sekunden-Stopp in Dumaguete
+                                document.querySelector('.info p').textContent = "2 Sekunden Stopp in Dumaguete!";
+                                setTimeout(() => {
+                                  document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
+                                  map.setView([9.28, 123.41], 10);
+                                  vehicle.setIcon(createVehicleIcon('ferry'));
+                                  animateMovement(dumaguete[0], dumaguete[1], siquijor[0], siquijor[1], 2000, 'ferry', () => {
+                                    document.querySelector('.info p').textContent = "2 Sekunden Stopp in Siquijor!";
+                                    setTimeout(() => {
+                                      document.querySelector('.info p').textContent = "Fähre zurück nach Dumaguete!";
+                                      animateMovement(siquijor[0], siquijor[1], dumaguete[0], dumaguete[1], 2000, 'ferry', () => {
+                                        document.querySelector('.info p').textContent = "Flugzeug unterwegs nach El Nido (über Cebu)!";
+                                        map.setView([12.86, 122.31], 7);
+                                        vehicle.setIcon(createVehicleIcon('plane'));
+                                        animateMovement(dumaguete[0], dumaguete[1], cebu[0], cebu[1], 1000, 'plane', () => {
+                                          animateMovement(cebu[0], cebu[1], elNido[0], elNido[1], 1500, 'plane', () => {
+                                            document.querySelector('.info p').textContent = "2 Sekunden Stopp in El Nido!";
+                                            setTimeout(() => {
+                                              document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Caticlan!";
+                                              animateMovement(elNido[0], elNido[1], caticlan[0], caticlan[1], 2000, 'plane', () => {
+                                                document.querySelector('.info p').textContent = "Fähre nach Boracay!";
+                                                map.setView([11.9206, 121.9375], 14);
+                                                vehicle.setIcon(createVehicleIcon('ferry'));
+                                                animateMovement(caticlan[0], caticlan[1], boracay[0], boracay[1], 2000, 'ferry', () => {
+                                                  document.querySelector('.info p').textContent = "2 Sekunden Stopp in Boracay!";
+                                                  setTimeout(() => {
+                                                    document.querySelector('.info p').textContent = "Fähre zurück nach Caticlan!";
+                                                    animateMovement(boracay[0], boracay[1], caticlan[0], caticlan[1], 2000, 'ferry', () => {
+                                                      document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Hamburg!";
+                                                      vehicle.setIcon(createVehicleIcon('plane'));
+                                                      map.setView([30, 60], 2.5);
+                                                      animateMovement(caticlan[0], caticlan[1], hamburg[0], hamburg[1], 8000, 'plane', () => {
+                                                        document.querySelector('.info p').textContent = "Reise abgeschlossen!";
+                                                        document.getElementById('startButton').disabled = false;
+                                                      });
                                                     });
-                                                  });
-                                                }, 2000);
+                                                  }, 2000);
+                                                });
                                               });
-                                            });
-                                          }, 2000);
+                                            }, 2000);
+                                          });
                                         });
                                       });
-                                    });
-                                  }, 2000);
-                                });
+                                    }, 2000);
+                                  });
+                                }, 2000); // 2-Sekunden-Stopp in Dumaguete
                               });
                             });
                           }, 2000);
