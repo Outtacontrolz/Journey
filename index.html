@@ -78,7 +78,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>V+P</h3>
+    <h3>Das Journey</h3>
     <p>Bereit für den Start!</p>
     <button id="startButton">Reise starten</button>
   </div>
@@ -167,13 +167,13 @@
       document.getElementById('startButton').disabled = true;
       // Fahrzeug-Icon aktualisieren
       vehicle.setIcon(createVehicleIcon(reise.fahrzeug));
-      // Zoom während der Stoppdauer auslösen
+      // Zoom nach 1 Sekunde der Stoppdauer auslösen
       if (reise.zoom) {
         setTimeout(() => {
           map.flyTo([reise.zoom[0], reise.zoom[1]], reise.zoom[2], {
-            duration: reise.stoppDauer / 1000 // Dauer des Zooms = Stoppdauer (in Sekunden)
+            duration: 1 // Dauer des Zooms: 1 Sekunde
           });
-        }, 0);
+        }, 1000); // Nach 1 Sekunde der Stoppdauer
       }
       // Animation starten
       animateMovement(
