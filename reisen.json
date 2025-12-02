@@ -1,6 +1,5 @@
 {
   "reisen": [
-    // **Hinflug: Hamburg → Doha → Ho-Chi-Minh**
     {
       "start": {
         "name": "Hamburg",
@@ -31,7 +30,6 @@
       "zoom": [30, 60, 2.5],
       "infoText": "Flugzeug unterwegs nach Ho-Chi-Minh!"
     },
-    // **Rest der Reise (unverändert)**
     {
       "start": {
         "name": "Ho-Chi-Minh",
@@ -224,7 +222,6 @@
       "stoppDauer": 2000,
       "infoText": "Fähre zurück nach Caticlan!"
     },
-    // **Rückflug: Caticlan → Doha → Hamburg**
     {
       "start": {
         "name": "Caticlan",
