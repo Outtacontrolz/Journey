@@ -248,7 +248,6 @@
       "fahrzeug": "plane",
       "dauer": 4000,
       "stoppDauer": 2000,
-      "zoom": [30, 60, 2.5],
       "infoText": "Flugzeug unterwegs nach Hamburg!"
     }
   ]
