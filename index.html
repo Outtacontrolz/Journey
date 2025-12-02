@@ -167,14 +167,6 @@
       document.getElementById('startButton').disabled = true;
       // Fahrzeug-Icon aktualisieren
       vehicle.setIcon(createVehicleIcon(reise.fahrzeug));
-      // Zoom nach 1 Sekunde der Stoppdauer auslösen
-      if (reise.zoom) {
-        setTimeout(() => {
-          map.flyTo([reise.zoom[0], reise.zoom[1]], reise.zoom[2], {
-            duration: 1 // Dauer des Zooms: 1 Sekunde
-          });
-        }, 1000); // Nach 1 Sekunde der Stoppdauer
-      }
       // Animation starten
       animateMovement(
         reise.start.koordinaten[0], reise.start.koordinaten[1],
