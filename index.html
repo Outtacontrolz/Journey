@@ -77,7 +77,7 @@
 <body>
   <div id="map"></div>
   <div class="info">
-    <h3>V+P</h3>
+    <h3>Das Journey</h3>
     <p>Bereit für den Start!</p>
     <button id="startButton">Reise starten</button>
   </div>
@@ -118,10 +118,18 @@
       .then(data => {
         const reisen = data.reisen;
 
-        // Marker für alle Ziele setzen
+        // Marker für alle Ziele setzen (mit Tooltips)
         reisen.forEach((reise, index) => {
-          markers[reise.ziel.name] = L.marker(reise.ziel.koordinaten).addTo(map);
-          markers[reise.start.name] = L.marker(reise.start.koordinaten).addTo(map);
+          if (!markers[reise.start.name]) {
+            markers[reise.start.name] = L.marker(reise.start.koordinaten)
+              .addTo(map)
+              .bindTooltip(reise.start.name, { permanent: false, direction: 'top' });
+          }
+          if (!markers[reise.ziel.name]) {
+            markers[reise.ziel.name] = L.marker(reise.ziel.koordinaten)
+              .addTo(map)
+              .bindTooltip(reise.ziel.name, { permanent: false, direction: 'top' });
+          }
         });
 
         // Fahrzeug am Startpunkt platzieren
@@ -147,7 +155,7 @@
       document.querySelector('.info p').textContent = reise.infoText;
       document.getElementById('startButton').disabled = true;
 
-      // Karte zoomen (falls definiert)
+      // Karte zoomen (falls in der JSON definiert)
       if (reise.zoom) {
         map.setView([reise.zoom[0], reise.zoom[1]], reise.zoom[2]);
       }
