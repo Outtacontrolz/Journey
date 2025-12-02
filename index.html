@@ -133,7 +133,7 @@
     }
 
     // JSON-Daten laden und Animation starten
-    fetch('reisen.json')
+    fetch('https://raw.githubusercontent.com/outtacontrolz/Journey/main/reisen.json')
       .then(response => response.json())
       .then(data => {
         const reisen = data.reisen;
