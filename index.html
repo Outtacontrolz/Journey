@@ -250,11 +250,11 @@
                           setTimeout(() => {
                             document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Manila!";
                             // Karte auf die Philippinen zoomen, bevor es nach Manila geht
-                            map.setView([12.8797, 121.7740], 6);
+                            map.setView([16.05, 114.47], 6);
                             vehicle.setIcon(createVehicleIcon('plane'));
                             animateMovement(haNoi[0], haNoi[1], manila[0], manila[1], 3000, 'plane', () => {
                               document.querySelector('.info p').textContent = "Flugzeug unterwegs nach Dumaguete!";
-                              map.setView([12, 122], 5);
+                              map.setView([12, 122], 7);
                               animateMovement(manila[0], manila[1], dumaguete[0], dumaguete[1], 3000, 'plane', () => {
                                 document.querySelector('.info p').textContent = "Fähre nach Siquijor!";
                                 map.setView([9.28, 123.41], 10);
