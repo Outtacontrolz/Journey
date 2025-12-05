@@ -25,24 +25,22 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 12px;
+      background: white;
+      padding: 10px;
       z-index: 1000;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
-      max-width: 80%;
-      font-size: 14px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      max-width: 300px;
     }
     #startButton {
       margin-top: 10px;
-      padding: 10px 16px;
+      padding: 8px 12px;
       background: #4CAF50;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 16px;
-      width: 100%;
+      font-size: 14px;
     }
     #startButton:hover { background: #45a049; }
     #startButton:disabled { background: #cccccc; }
@@ -55,13 +53,12 @@
       position: absolute;
       bottom: 10px;
       left: 10px;
-      background: rgba(255, 255, 255, 0.9);
+      background: white;
       padding: 10px;
       z-index: 1000;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
       font-family: Arial, sans-serif;
-      font-size: 12px;
     }
     .leaflet-control-attribution {
       display: none !important;
@@ -79,22 +76,31 @@
     .leaflet-tooltip:before {
       border-bottom-color: #3388ff;
     }
-    @media (max-width: 600px) {
+
+    /* Mobile-spezifische Anpassungen */
+    @media (max-width: 768px) {
       .info {
         top: 5px;
         right: 5px;
+        max-width: 90%;
         padding: 8px;
         font-size: 12px;
+        background: rgba(255, 255, 255, 0.95);
       }
       #startButton {
-        padding: 8px 12px;
+        padding: 10px;
         font-size: 14px;
+        width: 100%;
       }
       #coordinates {
         bottom: 5px;
         left: 5px;
-        padding: 6px;
         font-size: 10px;
+        padding: 6px;
+        background: rgba(255, 255, 255, 0.95);
+      }
+      .vehicle-icon {
+        font-size: 30px;
       }
     }
   </style>
@@ -107,15 +113,26 @@
     <button id="startButton">Reise starten</button>
   </div>
   <div id="coordinates">Lat: -, Lng: -, Zoom: -</div>
+
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Karte initialisieren
+    // Mobile-Erkennung
+    function isMobileDevice() {
+      return (typeof window.orientation !== "undefined") ||
+             (navigator.userAgent.indexOf('IEMobile') !== -1) ||
+             (window.innerWidth <= 768);
+    }
+
+    // Karte initialisieren (mobile: Zoom auf Vietnam/Philippinen)
+    const defaultView = isMobileDevice() ? [15, 105] : [30, 60];
+    const defaultZoom = isMobileDevice() ? 4 : 2.5;
+
     const map = L.map('map', {
       attributionControl: false,
-      zoomControl: false,
+      zoomControl: !isMobileDevice(),
       tap: true,
       tapTolerance: 15
-    }).setView([30, 60], 2.5);
+    }).setView(defaultView, defaultZoom);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
@@ -132,9 +149,10 @@
     // Fahrzeug-Icon erstellen
     function createVehicleIcon(vehicleType) {
       const icons = { plane: '✈️', bus: '🚌', ferry: '⛴️' };
+      const iconSize = isMobileDevice() ? [40, 40] : [60, 60];
       return L.divIcon({
         html: `<div class="vehicle-icon">${icons[vehicleType]}</div>`,
-        iconSize: [40, 40],
+        iconSize: iconSize,
         className: 'vehicle-marker'
       });
     }
