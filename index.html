@@ -41,8 +41,22 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 14px;
+      width: 100%;
+    }
+    #stopButton {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      width: 100%;
+      display: none;
     }
     #startButton:hover { background: #45a049; }
+    #stopButton:hover { background: #d32f2f; }
     #startButton:disabled { background: #cccccc; }
     .vehicle-icon {
       font-size: 36px;
@@ -87,7 +101,7 @@
         font-size: 12px;
         background: rgba(255, 255, 255, 0.95);
       }
-      #startButton {
+      #startButton, #stopButton {
         padding: 10px;
         font-size: 14px;
         width: 100%;
@@ -111,6 +125,7 @@
     <h3>V+P</h3>
     <p>Bereit für den Start!</p>
     <button id="startButton">Reise starten</button>
+    <button id="stopButton">Stop</button>
   </div>
   <div id="coordinates">Lat: -, Lng: -, Zoom: -</div>
 
@@ -123,9 +138,12 @@
              (window.innerWidth <= 768);
     }
 
+    // Globale Variable für die Animations-ID
+    let animationId = null;
+
     // Karte initialisieren (mobile: Zoom auf Vietnam/Philippinen)
-    const defaultView = isMobileDevice() ? [30 ,64] : [30, 60];
-    const defaultZoom = isMobileDevice() ? 1 : 2.5;
+    const defaultView = isMobileDevice() ? [15, 105] : [30, 60];
+    const defaultZoom = isMobileDevice() ? 4 : 2.5;
 
     const map = L.map('map', {
       attributionControl: false,
@@ -181,6 +199,20 @@
       });
     }
 
+    // Funktion zum Abbrechen der Animation
+    function stopAnimation() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+        document.getElementById('stopButton').style.display = 'none';
+        document.getElementById('startButton').disabled = false;
+        document.querySelector('.info p').textContent = "Animation gestoppt!";
+      }
+    }
+
+    // Event-Listener für den Stop-Button
+    document.getElementById('stopButton').addEventListener('click', stopAnimation);
+
     // JSON-Daten laden und Animation starten
     fetch('https://raw.githubusercontent.com/outtacontrolz/Journey/main/reisen.json')
       .then(response => {
@@ -219,18 +251,20 @@
       if (currentStep >= reisen.length) {
         document.querySelector('.info p').textContent = "Reise abgeschlossen!";
         document.getElementById('startButton').disabled = false;
+        document.getElementById('stopButton').style.display = 'none';
         return;
       }
+
       const reise = reisen[currentStep];
       document.querySelector('.info p').textContent = reise.infoText;
       document.getElementById('startButton').disabled = true;
-      // Karte zoomen (falls in der JSON definiert)
+      document.getElementById('stopButton').style.display = 'block';
+
       if (reise.zoom) {
         map.setView([reise.zoom[0], reise.zoom[1]], reise.zoom[2]);
       }
-      // Fahrzeug-Icon aktualisieren
+
       vehicle.setIcon(createVehicleIcon(reise.fahrzeug));
-      // Animation starten
       animateMovement(
         reise.start.koordinaten[0], reise.start.koordinaten[1],
         reise.ziel.koordinaten[0], reise.ziel.koordinaten[1],
@@ -250,21 +284,27 @@
       if (vehicleElement) {
         vehicleElement.style.transform = `rotate(${bearing}deg)`;
       }
+
       const startTime = performance.now();
       function animate(currentTime) {
+        if (!animationId) return;
+
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
         showNearbyCityNames(newLat, newLng);
+
         if (progress < 1) {
-          requestAnimationFrame(animate);
+          animationId = requestAnimationFrame(animate);
         } else {
+          animationId = null;
+          document.getElementById('stopButton').style.display = 'none';
           if (callback) callback();
         }
       }
-      requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
     }
 
     // Winkel für die Fahrzeugausrichtung berechnen
