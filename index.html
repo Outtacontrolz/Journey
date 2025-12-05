@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Das Journey – Reise durch Vietnam und die Philippinen</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -11,6 +12,7 @@
       padding: 0;
       font-family: Arial, sans-serif;
       overflow: hidden;
+      touch-action: manipulation;
     }
     #map {
       height: 100vh;
@@ -23,20 +25,24 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      background: white;
-      padding: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px;
       z-index: 1000;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+      max-width: 80%;
+      font-size: 14px;
     }
     #startButton {
       margin-top: 10px;
-      padding: 8px 12px;
+      padding: 10px 16px;
       background: #4CAF50;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 16px;
+      width: 100%;
     }
     #startButton:hover { background: #45a049; }
     #startButton:disabled { background: #cccccc; }
@@ -49,12 +55,13 @@
       position: absolute;
       bottom: 10px;
       left: 10px;
-      background: white;
+      background: rgba(255, 255, 255, 0.9);
       padding: 10px;
       z-index: 1000;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
       font-family: Arial, sans-serif;
+      font-size: 12px;
     }
     .leaflet-control-attribution {
       display: none !important;
@@ -72,6 +79,24 @@
     .leaflet-tooltip:before {
       border-bottom-color: #3388ff;
     }
+    @media (max-width: 600px) {
+      .info {
+        top: 5px;
+        right: 5px;
+        padding: 8px;
+        font-size: 12px;
+      }
+      #startButton {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      #coordinates {
+        bottom: 5px;
+        left: 5px;
+        padding: 6px;
+        font-size: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -85,10 +110,17 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
     // Karte initialisieren
-    const map = L.map('map', { attributionControl: false }).setView([30, 60], 2.5);
+    const map = L.map('map', {
+      attributionControl: false,
+      zoomControl: false,
+      tap: true,
+      tapTolerance: 15
+    }).setView([30, 60], 2.5);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
+
     // Aktuelle Koordinaten anzeigen
     map.on('moveend', function() {
       const center = map.getCenter();
@@ -96,18 +128,21 @@
       document.getElementById('coordinates').textContent =
         `Lat: ${center.lat.toFixed(4)}, Lng: ${center.lng.toFixed(4)}, Zoom: ${zoom}`;
     });
+
     // Fahrzeug-Icon erstellen
     function createVehicleIcon(vehicleType) {
       const icons = { plane: '✈️', bus: '🚌', ferry: '⛴️' };
       return L.divIcon({
         html: `<div class="vehicle-icon">${icons[vehicleType]}</div>`,
-        iconSize: [60, 60],
+        iconSize: [40, 40],
         className: 'vehicle-marker'
       });
     }
+
     // Fahrzeug und Marker
     let vehicle;
     let markers = {};
+
     // Funktion, um Stadtnamen in der Nähe des Fahrzeugs anzuzeigen
     function showNearbyCityNames(lat, lng) {
       Object.entries(markers).forEach(([city, marker]) => {
@@ -116,7 +151,7 @@
           Math.pow(lat - markerLatLng.lat, 2) +
           Math.pow(lng - markerLatLng.lng, 2)
         );
-        if (distance < 5) { // Radius von 5°
+        if (distance < 5) {
           if (!marker.getTooltip()) {
             marker.bindTooltip(city, { permanent: true, direction: 'top' }).openTooltip();
           }
@@ -127,6 +162,7 @@
         }
       });
     }
+
     // JSON-Daten laden und Animation starten
     fetch('https://raw.githubusercontent.com/outtacontrolz/Journey/main/reisen.json')
       .then(response => {
@@ -136,7 +172,6 @@
         return response.json();
       })
       .then(data => {
-        console.log("Daten erfolgreich geladen:", data); // Debugging
         const reisen = data.reisen;
         // Marker für alle Ziele setzen
         reisen.forEach((reise) => {
@@ -160,6 +195,7 @@
         console.error("Fehler beim Laden der Daten:", error);
         document.querySelector('.info p').textContent = `Fehler: ${error.message}`;
       });
+
     // Animation der Reise
     function startAnimation(reisen, currentStep) {
       if (currentStep >= reisen.length) {
@@ -168,7 +204,6 @@
         return;
       }
       const reise = reisen[currentStep];
-      console.log(`Aktuelle Reise: ${reise.start.name} → ${reise.ziel.name}`); // Debugging
       document.querySelector('.info p').textContent = reise.infoText;
       document.getElementById('startButton').disabled = true;
       // Karte zoomen (falls in der JSON definiert)
@@ -184,12 +219,12 @@
         reise.dauer,
         reise.fahrzeug,
         () => {
-          // Stopp-Dauer aus der JSON oder Standard (2000ms)
           const stoppDauer = reise.stoppDauer !== undefined ? reise.stoppDauer : 2000;
           setTimeout(() => startAnimation(reisen, currentStep + 1), stoppDauer);
         }
       );
     }
+
     // Bewegung animieren
     function animateMovement(startLat, startLng, endLat, endLng, duration, vehicleType, callback) {
       const bearing = calculateBearing(startLat, startLng, endLat, endLng);
@@ -204,7 +239,6 @@
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
         vehicle.setLatLng([newLat, newLng]);
-        // Stadtnamen in der Nähe anzeigen
         showNearbyCityNames(newLat, newLng);
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -214,6 +248,7 @@
       }
       requestAnimationFrame(animate);
     }
+
     // Winkel für die Fahrzeugausrichtung berechnen
     function calculateBearing(lat1, lng1, lat2, lng2) {
       const dLng = lng2 - lng1;
