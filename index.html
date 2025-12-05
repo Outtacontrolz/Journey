@@ -43,7 +43,7 @@
       font-size: 14px;
       width: 100%;
     }
-    #stopButton {
+    #pauseButton {
       margin-top: 10px;
       padding: 8px 12px;
       background: #f44336;
@@ -56,7 +56,7 @@
       display: none;
     }
     #startButton:hover { background: #45a049; }
-    #stopButton:hover { background: #d32f2f; }
+    #pauseButton:hover { background: #d32f2f; }
     #startButton:disabled { background: #cccccc; }
     .vehicle-icon {
       font-size: 36px;
@@ -101,7 +101,7 @@
         font-size: 12px;
         background: rgba(255, 255, 255, 0.95);
       }
-      #startButton, #stopButton {
+      #startButton, #pauseButton {
         padding: 10px;
         font-size: 14px;
         width: 100%;
@@ -125,7 +125,7 @@
     <h3>V+P</h3>
     <p>Bereit für den Start!</p>
     <button id="startButton">Reise starten</button>
-    <button id="stopButton">Stop</button>
+    <button id="pauseButton">Pause</button>
   </div>
   <div id="coordinates">Lat: -, Lng: -, Zoom: -</div>
 
@@ -138,8 +138,12 @@
              (window.innerWidth <= 768);
     }
 
-    // Globale Variable für die Animations-ID
+    // Globale Variablen für Animation
     let animationId = null;
+    let animationPaused = false;
+    let animationStartTime = null;
+    let animationElapsedTime = 0;
+    let currentAnimationParams = null;
 
     // Karte initialisieren (mobile: Zoom auf Vietnam/Philippinen)
     const defaultView = isMobileDevice() ? [15, 105] : [30, 60];
@@ -199,19 +203,25 @@
       });
     }
 
-    // Funktion zum Abbrechen der Animation
-    function stopAnimation() {
-      if (animationId) {
+    // Funktion zum Pausieren/Fortsetzen der Animation
+    function togglePauseAnimation() {
+      if (animationPaused) {
+        // Animation fortsetzen
+        document.getElementById('pauseButton').textContent = 'Pause';
+        animationPaused = false;
+        animationStartTime = performance.now() - animationElapsedTime;
+        animateMovement(...currentAnimationParams);
+      } else {
+        // Animation pausieren
+        document.getElementById('pauseButton').textContent = 'Weiter';
+        animationPaused = true;
         cancelAnimationFrame(animationId);
         animationId = null;
-        document.getElementById('stopButton').style.display = 'none';
-        document.getElementById('startButton').disabled = false;
-        document.querySelector('.info p').textContent = "Animation gestoppt!";
       }
     }
 
-    // Event-Listener für den Stop-Button
-    document.getElementById('stopButton').addEventListener('click', stopAnimation);
+    // Event-Listener für den Pause/Weiter-Button
+    document.getElementById('pauseButton').addEventListener('click', togglePauseAnimation);
 
     // JSON-Daten laden und Animation starten
     fetch('https://raw.githubusercontent.com/outtacontrolz/Journey/main/reisen.json')
@@ -251,14 +261,15 @@
       if (currentStep >= reisen.length) {
         document.querySelector('.info p').textContent = "Reise abgeschlossen!";
         document.getElementById('startButton').disabled = false;
-        document.getElementById('stopButton').style.display = 'none';
+        document.getElementById('pauseButton').style.display = 'none';
         return;
       }
 
       const reise = reisen[currentStep];
       document.querySelector('.info p').textContent = reise.infoText;
       document.getElementById('startButton').disabled = true;
-      document.getElementById('stopButton').style.display = 'block';
+      document.getElementById('pauseButton').style.display = 'block';
+      document.getElementById('pauseButton').textContent = 'Pause';
 
       if (reise.zoom) {
         map.setView([reise.zoom[0], reise.zoom[1]], reise.zoom[2]);
@@ -285,11 +296,14 @@
         vehicleElement.style.transform = `rotate(${bearing}deg)`;
       }
 
-      const startTime = performance.now();
-      function animate(currentTime) {
-        if (!animationId) return;
+      currentAnimationParams = [startLat, startLng, endLat, endLng, duration, vehicleType, callback];
 
-        const elapsed = currentTime - startTime;
+      animationStartTime = animationStartTime || performance.now();
+      const startTime = animationStartTime;
+      const initialElapsed = animationElapsedTime;
+
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime + initialElapsed;
         const progress = Math.min(elapsed / duration, 1);
         const newLat = startLat + (endLat - startLat) * progress;
         const newLng = startLng + (endLng - startLng) * progress;
@@ -300,7 +314,9 @@
           animationId = requestAnimationFrame(animate);
         } else {
           animationId = null;
-          document.getElementById('stopButton').style.display = 'none';
+          animationStartTime = null;
+          animationElapsedTime = 0;
+          document.getElementById('pauseButton').style.display = 'none';
           if (callback) callback();
         }
       }
