@@ -20,7 +20,7 @@
         "koordinaten": [25.2854, 51.5310]
       },
       "ziel": {
-        "name": "Ho-Chi-Minh",
+        "name": "Ho-Chi-Minh (2 Nächte)",
         "koordinaten": [10.8231, 106.6297]
       },
       "fahrzeug": "plane",
@@ -31,11 +31,11 @@
     },
     {
       "start": {
-        "name": "Ho-Chi-Minh",
+        "name": "Ho-Chi-Minh (2 Nächte)",
         "koordinaten": [10.8231, 106.6297]
       },
       "ziel": {
-        "name": "Da Nang",
+        "name": "Da Nang (3 Nächte)",
         "koordinaten": [16.0471, 108.2062]
       },
       "fahrzeug": "plane",
@@ -46,7 +46,7 @@
     },
     {
       "start": {
-        "name": "Da Nang",
+        "name": "Da Nang (3 Nächte)",
         "koordinaten": [16.0471, 108.2062]
       },
       "ziel": {
@@ -65,7 +65,7 @@
         "koordinaten": [21.0285, 105.8542]
       },
       "ziel": {
-        "name": "Sa Pa",
+        "name": "Sa Pa (3 Nächte)",
         "koordinaten": [22.3333, 103.85]
       },
       "fahrzeug": "bus",
@@ -76,7 +76,7 @@
     },
     {
       "start": {
-        "name": "Sa Pa",
+        "name": "Sa Pa (3 Nächte)",
         "koordinaten": [22.3333, 103.85]
       },
       "ziel": {
@@ -91,11 +91,11 @@
     },
     {
       "start": {
-        "name": "Ha Noi",
+        "name": "Ha Noi (4 Nächte)",
         "koordinaten": [21.0285, 105.8542]
       },
       "ziel": {
-        "name": "Manila",
+        "name": "über Manila",
         "koordinaten": [14.5995, 120.9842]
       },
       "fahrzeug": "plane",
@@ -106,7 +106,7 @@
     },
     {
       "start": {
-        "name": "Manila",
+        "name": "über Manila",
         "koordinaten": [14.5995, 120.9842]
       },
       "ziel": {
@@ -125,7 +125,7 @@
         "koordinaten": [9.3074, 123.3054]
       },
       "ziel": {
-        "name": "Siquijor",
+        "name": "Siquijor (5 Nächte)",
         "koordinaten": [9.2167, 123.5833]
       },
       "fahrzeug": "ferry",
@@ -136,7 +136,7 @@
     },
     {
       "start": {
-        "name": "Siquijor",
+        "name": "Siquijor (5 Nächte)",
         "koordinaten": [9.2167, 123.5833]
       },
       "ziel": {
@@ -154,7 +154,7 @@
         "koordinaten": [9.3074, 123.3054]
       },
       "ziel": {
-        "name": "Cebu",
+        "name": "über Cebu",
         "koordinaten": [10.3157, 123.8854]
       },
       "fahrzeug": "plane",
@@ -165,11 +165,11 @@
     },
     {
       "start": {
-        "name": "Cebu",
+        "name": "über Cebu",
         "koordinaten": [10.3157, 123.8854]
       },
       "ziel": {
-        "name": "El Nido",
+        "name": "El Nido (5 Nächte)",
         "koordinaten": [11.1956, 119.4936]
       },
       "fahrzeug": "plane",
@@ -180,7 +180,7 @@
     },
     {
       "start": {
-        "name": "El Nido",
+        "name": "El Nido (5 Nächte)",
         "koordinaten": [11.1956, 119.4936]
       },
       "ziel": {
@@ -198,7 +198,7 @@
         "koordinaten": [11.93, 121.95]
       },
       "ziel": {
-        "name": "Boracay",
+        "name": "Boracay (5 Nächte)",
         "koordinaten": [11.9410, 121.9386]
       },
       "fahrzeug": "ferry",
@@ -209,7 +209,7 @@
     },
     {
       "start": {
-        "name": "Boracay",
+        "name": "Boracay (5 Nächte)",
         "koordinaten": [11.9410, 121.9386]
       },
       "ziel": {
