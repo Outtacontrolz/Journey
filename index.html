@@ -206,13 +206,11 @@
     // Funktion zum Pausieren/Fortsetzen der Animation
     function togglePauseAnimation() {
       if (animationPaused) {
-        // Animation fortsetzen
         document.getElementById('pauseButton').textContent = 'Pause';
         animationPaused = false;
         animationStartTime = performance.now() - animationElapsedTime;
         animateMovement(...currentAnimationParams);
       } else {
-        // Animation pausieren
         document.getElementById('pauseButton').textContent = 'Weiter';
         animationPaused = true;
         cancelAnimationFrame(animationId);
@@ -303,6 +301,11 @@
       const initialElapsed = animationElapsedTime;
 
       function animate(currentTime) {
+        if (animationPaused) {
+          animationElapsedTime = currentTime - startTime;
+          return;
+        }
+
         const elapsed = currentTime - startTime + initialElapsed;
         const progress = Math.min(elapsed / duration, 1);
         const newLat = startLat + (endLat - startLat) * progress;
