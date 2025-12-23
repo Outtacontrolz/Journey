@@ -227,7 +227,7 @@
         "koordinaten": [11.93, 121.95]
       },
       "ziel": {
-        "name": "Doha",
+        "name": "über Doha",
         "koordinaten": [25.2854, 51.5310]
       },
       "fahrzeug": "plane",
@@ -238,7 +238,7 @@
     },
     {
       "start": {
-        "name": "Doha",
+        "name": "über Doha",
         "koordinaten": [25.2854, 51.5310]
       },
       "ziel": {
